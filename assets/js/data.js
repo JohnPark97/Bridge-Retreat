@@ -3,6 +3,8 @@ import { CONFIG } from './config.js';
 const yamlMod = import('https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/+esm');
 const papaMod = import('https://cdn.jsdelivr.net/npm/papaparse@5.4.1/+esm');
 
+export const CACHE_PREFIX = 'br_cache_';
+
 async function fetchText(url) {
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`fetch ${url} failed: ${res.status}`);
@@ -44,40 +46,86 @@ function isPlaceholder(s) {
   return !s || /^PASTE_/.test(s) || /^CHANGE_ME/.test(s);
 }
 
+/**
+ * Stale-while-revalidate cache, backed by localStorage.
+ *
+ * - Cache hit  → returns cached data instantly; refreshes in the background.
+ * - Cache miss → fetches fresh, writes cache, returns. Throws on failure.
+ * - Corrupt/garbage cache → treated as a miss (forces a fresh fetch).
+ * - Background refresh failures are swallowed (cached data is still good).
+ *
+ * Live mode only — dev mode reads sample data straight through so devs see
+ * file edits immediately.
+ */
+async function withSWR(key, fetcher) {
+  let cached = null;
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.data !== undefined) cached = parsed;
+    }
+  } catch {
+    // Corrupt JSON in cache slot — fall through to a fresh fetch.
+  }
+
+  if (cached) {
+    fetcher()
+      .then(data => writeCache(key, data))
+      .catch(() => { /* keep cache on background failure */ });
+    return cached.data;
+  }
+
+  // No cache — must wait for network.
+  const data = await fetcher();
+  writeCache(key, data);
+  return data;
+}
+
+function writeCache(key, data) {
+  try {
+    localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ data, ts: Date.now() }));
+  } catch {
+    // Quota exceeded or storage disabled — silent. App still functions, just no cache.
+  }
+}
+
+function maybeCached(key, fetcher) {
+  return devMode() ? fetcher() : withSWR(key, fetcher);
+}
+
+const mapRoster = rows => rows.map(row => ({
+  id:            Number(row.id),
+  korean_name:   String(row.korean_name || '').trim(),
+  birthday:      parseBirthday(row.birthday),
+  room:          String(row.room ?? '').trim(),
+  floor:         String(row.floor ?? '').trim(),
+  cell_name:     String(row.cell_name || '').trim(),
+  is_leader:     String(row.is_leader).toUpperCase() === 'TRUE',
+  checked_in_at: String(row.checked_in_at || '').trim() || null,
+}));
+
+const mapCells = rows => rows.map(row => ({
+  cell_name:    String(row.cell_name || '').trim(),
+  meeting_room: String(row.meeting_room || '').trim(),
+}));
+
 export async function loadTheme() {
-  return loadYaml('data/theme.yml');
+  return maybeCached('theme', () => loadYaml('data/theme.yml'));
 }
 
 export async function loadSchedule() {
-  return loadYaml('data/schedule.yml');
+  return maybeCached('schedule', () => loadYaml('data/schedule.yml'));
 }
 
 export async function loadRoster() {
-  const rows = devMode()
-    ? await loadSampleCsv('data/sample-roster.csv')
-    : await loadFromAppsScript('read_roster');
-
-  return rows.map(row => ({
-    id:            Number(row.id),
-    korean_name:   String(row.korean_name || '').trim(),
-    birthday:      parseBirthday(row.birthday),
-    room:          String(row.room ?? '').trim(),
-    floor:         String(row.floor ?? '').trim(),
-    cell_name:     String(row.cell_name || '').trim(),
-    is_leader:     String(row.is_leader).toUpperCase() === 'TRUE',
-    checked_in_at: String(row.checked_in_at || '').trim() || null,
-  }));
+  if (devMode()) return mapRoster(await loadSampleCsv('data/sample-roster.csv'));
+  return withSWR('roster', async () => mapRoster(await loadFromAppsScript('read_roster')));
 }
 
 export async function loadCells() {
-  const rows = devMode()
-    ? await loadSampleCsv('data/sample-cells.csv')
-    : await loadFromAppsScript('read_cells');
-
-  return rows.map(row => ({
-    cell_name:    String(row.cell_name || '').trim(),
-    meeting_room: String(row.meeting_room || '').trim(),
-  }));
+  if (devMode()) return mapCells(await loadSampleCsv('data/sample-cells.csv'));
+  return withSWR('cells', async () => mapCells(await loadFromAppsScript('read_cells')));
 }
 
 // "12/29/1981" → { month: 12, day: 29, year: 1981 }

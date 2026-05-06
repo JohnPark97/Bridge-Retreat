@@ -1,4 +1,5 @@
 import { CONFIG } from './config.js';
+import { CACHE_PREFIX } from './data.js';
 
 export function getSession() {
   try {
@@ -40,6 +41,11 @@ export function patchSession(patch) {
 
 export function clearSession() {
   localStorage.removeItem(CONFIG.SESSION_KEY);
+  // Clear cached data so the next user on this device doesn't see stale roster.
+  // Iterate over a static key list (Object.keys snapshot) — removeItem mutates.
+  for (const key of Object.keys(localStorage)) {
+    if (key.startsWith(CACHE_PREFIX)) localStorage.removeItem(key);
+  }
 }
 
 // Match a person by Korean name + birth month + birth day
