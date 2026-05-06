@@ -36,13 +36,20 @@ export function findNextMainEvent(schedule, now = getNow()) {
 }
 
 export function todaysEvents(schedule, now = getNow()) {
-  if (!schedule?.days) return [];
+  if (!schedule?.days || schedule.days.length === 0) return [];
   const key = dateKey(new Date(now));
-  const day = schedule.days.find(d => dateKey(d.date) === key);
-  if (!day) return [];
+  let day = schedule.days.find(d => dateKey(d.date) === key);
+  
+  // Fallback: If today is not in the schedule (e.g. before the retreat starts), show the first day's schedule.
+  if (!day) {
+    day = schedule.days[0];
+  }
+
   return day.events.map(ev => ({
     ...ev,
     _start: eventStartTime(day.date, ev.time),
+    _dayLabel: day.label,
+    _dayDate: day.date,
   }));
 }
 

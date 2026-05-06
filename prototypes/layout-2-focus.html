@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F7F8FA">
+<title>Layout 2 - Focus</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<style>
+  .focus-hero {
+    margin: 64px 24px 24px;
+    padding: 32px 24px;
+    background: var(--gradient-brand);
+    border-radius: 32px;
+    color: var(--card);
+    box-shadow: 0 24px 48px -12px var(--shadow-color-brand);
+    position: relative; overflow: hidden;
+  }
+  .focus-hero::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at top right, rgba(255,255,255,0.1), transparent 60%);
+  }
+  .focus-hero .greeting { font-size: 14px; opacity: 0.8; font-weight: 600; margin-bottom: 24px; }
+  .focus-hero h2 { font-size: 32px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .focus-hero .context { font-size: 16px; opacity: 0.9; margin-bottom: 32px; line-height: 1.5; }
+  .focus-hero .room-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 999px;
+    font-size: 14px; font-weight: 700; backdrop-filter: blur(8px);
+  }
+
+  .group-preview {
+    margin: 0 24px 24px; padding: 20px 24px;
+    background: var(--card); border-radius: 24px; box-shadow: var(--shadow-md);
+  }
+  .group-preview .lbl { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-bottom: 12px; }
+  .group-faces { display: flex; gap: 8px; }
+  .face { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-accent-soft-hover); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--ink); }
+
+  body { padding-bottom: 90px; }
+</style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <header class="topbar reveal d1">
+    <span class="brand"><span class="logo"></span>Bridge Retreat</span>
+  </header>
+
+  <main id="content">
+    <section class="focus-hero reveal d2">
+      <div class="greeting">안녕, 박종혁 님</div>
+      <h2>다음 일정은<br>환영 예배입니다.</h2>
+      <div class="context">15분 뒤 본당에서 시작합니다. 늦지 않게 이동해주세요.</div>
+      <div class="room-pill">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L4 9V21H9V14H15V21H20V9L12 3Z"/></svg>
+        301호
+      </div>
+    </section>
+
+    <div class="group-preview reveal d3">
+      <div class="lbl">내 조원 (7조)</div>
+      <div class="group-faces">
+        <div class="face" style="background:var(--ink);color:white;">나</div>
+        <div class="face">김</div>
+        <div class="face">이</div>
+        <div class="face">박</div>
+        <div class="face">최</div>
+      </div>
+    </div>
+
+    <section class="schedule reveal d4" style="margin: 0 24px 24px;">
+      <div class="head">
+        <span class="title">오늘의 일정</span>
+      </div>
+      <div class="ev now">
+        <span class="time">16:00</span>
+        <span class="title">자유 시간</span>
+        <span class="place">숙소</span>
+      </div>
+      <div class="ev">
+        <span class="time">16:15</span>
+        <span class="title">환영 예배</span>
+        <span class="place">본당</span>
+      </div>
+      <div class="ev">
+        <span class="time">18:00</span>
+        <span class="title">저녁 식사</span>
+        <span class="place">식당</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

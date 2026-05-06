@@ -35,17 +35,19 @@ function buildGroupInfo(cell, fallbackName) {
   const cellName = cell?.cell_name || fallbackName || '';
   const meetingRoom = cell?.meeting_room || '미정';
 
-  return el('section', { class: 'hero reveal d2' },
-    el('div', { class: 'greet' }, '내 그룹'),
-    el('h1', {},
-      el('span', { class: 'gr', text: cellName }),
-    ),
-    el('div', { class: 'meta' },
-      el('span', { class: 'chip accent' },
-        svg('0 0 24 24', [...ICON_PIN, ...PIN_DOT], { strokeWidth: 2.4 }),
-        ` 모임 장소 · ${meetingRoom}`,
-      ),
-    ),
+  const pinIcon = svg('0 0 24 24', [...ICON_PIN, ...PIN_DOT], { strokeWidth: 2 });
+  pinIcon.style.width = '16px';
+  pinIcon.style.height = '16px';
+  pinIcon.style.color = 'var(--ink-3)';
+  pinIcon.style.flexShrink = '0';
+
+  return el('section', { class: 'journal-hero reveal d2', style: 'margin-bottom: 0;' },
+    el('div', { class: 'date' }, '내 조원'),
+    el('blockquote', { style: 'font-size: 28px; font-style: normal; margin-bottom: 12px; font-weight: 700;' }, cellName),
+    el('cite', { style: 'font-size: 13px; font-weight: 600; color: var(--ink-3); display: flex; align-items: center; justify-content: center; gap: 6px;' },
+      pinIcon,
+      meetingRoom
+    )
   );
 }
 
@@ -56,9 +58,8 @@ function buildMembers(members, session) {
   );
 
   if (members.length === 0) {
-    return el('section', { class: 'members reveal d3' },
-      head,
-      el('div', { style: 'padding:24px 16px;text-align:center;color:var(--ink-3);font-size:14px;' },
+    return el('section', { class: 'segmented-agenda reveal d3' },
+      el('div', { style: 'padding:48px 16px;text-align:center;color:var(--ink-3);font-size:14px;' },
         '아직 등록된 그룹원이 없어요.'),
     );
   }
@@ -66,35 +67,33 @@ function buildMembers(members, session) {
   const leaders = members.filter(m => m.is_leader);
   const others  = members.filter(m => !m.is_leader);
 
-  const children = [head];
+  const labelStyle = 'font-size: 12px; font-weight: 700; color: var(--ink-4); margin: 24px 8px 12px; letter-spacing: 0.05em; text-transform: uppercase;';
+  const gridStyle = 'display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 8px; margin-bottom: 24px;';
+  
+  const children = [];
   if (leaders.length > 0) {
-    children.push(el('div', { class: 'section-divider', text: '리더' }));
-    leaders.forEach(m => children.push(buildMemberRow(m, session, true)));
+    children.push(el('div', { style: labelStyle, text: '리더' }));
+    children.push(el('div', { style: gridStyle }, ...leaders.map(m => buildMemberCell(m, session))));
   }
   if (others.length > 0) {
-    children.push(el('div', { class: 'section-divider', text: '그룹원' }));
-    others.forEach(m => children.push(buildMemberRow(m, session, false)));
+    children.push(el('div', { style: labelStyle, text: '그룹원' }));
+    children.push(el('div', { style: gridStyle }, ...others.map(m => buildMemberCell(m, session))));
   }
 
-  return el('section', { class: 'members reveal d3' }, ...children);
+  return el('section', { class: 'segmented-agenda reveal d3', style: 'padding: 0 12px;' }, ...children);
 }
 
-function buildMemberRow(person, session, isLeader) {
-  const initial = (person.korean_name || '?').slice(0, 1);
+function buildMemberCell(person, session) {
   const isMe = person.id === session.id;
-
-  const nameNode = el('span', { class: 'name', text: person.korean_name || '?' });
-  if (isMe) {
-    nameNode.append(el('span', { class: 'me', text: '나' }));
-  }
-  if (isLeader) {
-    nameNode.append(el('span', { class: 'role', text: '리더' }));
-  }
-
-  return el('div', { class: `member-row ${isLeader ? 'leader' : ''}`.trim() },
-    el('div', { class: 'avatar', text: initial }),
+  
+  const nameNode = el('span', { 
+    style: `font-size: 16px; letter-spacing: -0.01em; ${isMe ? 'font-weight: 800; color: var(--ink);' : 'font-weight: 600; color: var(--ink-2);'}`, 
+    text: person.korean_name || '?' 
+  });
+  
+  return el('div', { style: 'display: flex; align-items: baseline; gap: 8px;' },
     nameNode,
-    el('div', { class: 'room', text: person.room ? `${person.room}호` : '' }),
+    el('span', { style: 'font-size: 12px; font-weight: 600; color: var(--ink-4);', text: person.room ? `${person.room}호` : '' })
   );
 }
 

@@ -1,14 +1,7 @@
 import { el, svg } from './dom.js';
 import {
-  findNextMainEvent, todaysEvents, classifyEvents,
-  startCountdown, getNow,
+  findNextMainEvent, todaysEvents, classifyEvents, getNow,
 } from './countdown.js';
-
-const ICON_HOUSE    = ['M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z'];
-const ICON_SUNRISE  = [
-  'M12 2v4', 'M12 18v4', 'M4.93 4.93l2.83 2.83', 'M16.24 16.24l2.83 2.83',
-  'M2 12h4', 'M18 12h4', 'M4.93 19.07l2.83-2.83', 'M16.24 7.76l2.83-2.83',
-];
 
 const pad = n => String(n).padStart(2, '0');
 
@@ -17,147 +10,145 @@ export function renderHome(ctx) {
   const root = document.getElementById('home');
   root.replaceChildren();
 
-  const hero = buildHero(session);
-  const cd   = buildCountdown();
-  const verse = buildVerse(theme);
+  // 1. Build Static Layouts
+  const hero = buildJournalHero(theme, schedule);
+  const meta = buildJournalMeta(session);
 
-  let todayEl = buildToday(classifyEvents(todaysEvents(schedule)));
+  // 2. Build Dynamic Layouts
+  let dynamicContainer = el('div');
+  const updateDynamic = () => {
+    const events = classifyEvents(todaysEvents(schedule));
+    const target = findNextMainEvent(schedule);
+    const banner = buildAlertBanner(target);
+    const agenda = buildSegmentedAgenda(events);
+    
+    dynamicContainer.replaceChildren();
+    if (banner) dynamicContainer.append(banner);
+    dynamicContainer.append(agenda);
+  };
+  updateDynamic();
 
-  root.append(hero, cd.card, verse, todayEl);
+  // 3. Build Action Bar
 
-  // Wire countdown
-  const target = findNextMainEvent(schedule);
-  if (!target) {
-    cd.card.hidden = true;
-  } else {
-    cd.tName.textContent  = target.title;
-    cd.tPlace.textContent = `${target._dayLabel || ''} · ${target.place || ''}`.replace(/^\s*·\s*/, '');
-    cd.tTime.textContent  = target.time || '';
+  root.append(hero, meta, dynamicContainer);
 
-    startCountdown(target, ({ h, m, s, ready, started }) => {
-      cd.hh.textContent = pad(h);
-      cd.mm.textContent = pad(m);
-      cd.ss.textContent = pad(s);
-      cd.at.textContent = started
-        ? '시작됨'
-        : (h > 0 ? `in ${h}h ${m}m` : `in ${m}m`);
-      cd.card.classList.toggle('ready', ready);
-    });
+  // Update dynamic parts every minute
+  setInterval(updateDynamic, 60 * 1000);
+}
+
+function buildJournalHero(theme, schedule) {
+  // Pick a random verse from the pool, or fall back to the single verse
+  const pool = theme?.verses;
+  const v = (pool && pool.length > 0)
+    ? pool[Math.floor(Math.random() * pool.length)]
+    : (theme?.verse || {});
+  let verseKo = String(v.text_ko || '');
+  
+  // Format Date logic
+  const events = todaysEvents(schedule);
+  const eventDateObj = events.length > 0 && events[0]._dayDate ? new Date(events[0]._dayDate) : new Date(getNow());
+  
+  // Use UTC format if we used the schedule date so timezone shifts don't bump it back a day
+  const useUTC = events.length > 0 && events[0]._dayDate;
+  const dateStr = eventDateObj.toLocaleDateString('en-US', { 
+    month: 'short', day: 'numeric', year: 'numeric',
+    timeZone: useUTC ? 'UTC' : undefined
+  });
+  const dayLbl = events.length > 0 && events[0]._dayLabel ? events[0]._dayLabel : 'Day 01';
+
+  return el('section', { class: 'journal-hero reveal d2' },
+    el('div', { class: 'date', text: `${dateStr} · ${dayLbl}` }),
+    el('blockquote', { text: `"${verseKo}"` }),
+    el('cite', { text: v.reference_ko || '' })
+  );
+}
+
+function buildJournalMeta(session) {
+  const name = session.korean_name ? `${session.korean_name} 님` : '환영합니다';
+  const room = session.room ? `${session.room}호` : '미배정';
+  const cell = session.cell_name ? session.cell_name : '';
+  
+  const details = el('div', { class: 'details' }, room);
+  if (cell) {
+    details.append(el('span', { class: 'sep' }), cell);
   }
 
-  // Re-classify schedule states each minute so past/now/upcoming flip as time passes.
-  setInterval(() => {
-    const fresh = buildToday(classifyEvents(todaysEvents(schedule)));
-    todayEl.replaceWith(fresh);
-    todayEl = fresh;
-  }, 60 * 1000);
-}
-
-function buildHero(session) {
-  return el('section', { class: 'hero reveal d2' },
-    el('div', { class: 'greet' },
-      el('span', { class: 'pip' }),
-      '환영합니다',
-    ),
-    el('h1', {},
-      '안녕, ',
-      el('span', { class: 'gr', text: session.korean_name || '' }),
-      ' 님!',
-    ),
-    el('div', { class: 'meta' },
-      el('span', { class: 'chip accent' },
-        svg('0 0 24 24', ICON_HOUSE, { strokeWidth: 2.5 }),
-        ` ${session.room ?? ''}호`,
-      ),
-      session.floor ? el('span', { class: 'chip', text: `${session.floor}층` }) : null,
-      session.cell_name ? el('span', { class: 'chip', text: session.cell_name }) : null,
-    ),
+  return el('div', { class: 'journal-meta reveal d3' },
+    el('div', { class: 'name', text: name }),
+    details
   );
 }
 
-function buildCountdown() {
-  const live = el('span', { class: 'live' });
-  const lbl  = el('span', { class: 'lbl' }, live, '다음 일정');
-  const at   = el('span', { class: 'at' });
-
-  const hh = el('span', { text: '00' });
-  const mm = el('span', { text: '00' });
-  const ss = el('span', { text: '00' });
-  const digits = el('div', { class: 'digits' },
-    hh, el('span', { class: 'colon', text: ':' }),
-    mm, el('span', { class: 'colon', text: ':' }),
-    ss,
-  );
-
-  const tName  = el('div', { class: 'name' });
-  const tPlace = el('div', { class: 'place' });
-  const tTime  = el('div', { class: 'time' });
-  const target = el('div', { class: 'target' },
-    el('div', { class: 'icon' }, svg('0 0 24 24', ICON_SUNRISE, { strokeWidth: 2.5 })),
-    el('div', { class: 'info' }, tName, tPlace),
-    tTime,
-  );
-
-  const card = el('section', { class: 'countdown reveal d3' },
-    el('div', { class: 'head' }, lbl, at),
-    digits,
-    target,
-  );
-  return { card, hh, mm, ss, at, tName, tPlace, tTime };
-}
-
-function buildVerse(theme) {
-  const v = theme?.verse || {};
-  const text = String(v.text_ko || '');
-  const emphasis = String(v.emphasis || '');
-
-  const blockquote = el('blockquote');
-  if (emphasis && text.includes(emphasis)) {
-    const i = text.indexOf(emphasis);
-    blockquote.append(text.slice(0, i));
-    blockquote.append(el('span', { class: 'em', text: emphasis }));
-    blockquote.append(text.slice(i + emphasis.length));
-  } else {
-    blockquote.textContent = text;
+function buildAlertBanner(target) {
+  if (!target || !target._start) return null;
+  
+  const nowMs = getNow();
+  const diffMs = target._start - nowMs;
+  const diffMins = Math.floor(diffMs / 60000);
+  
+  // Show banner if event starts within 15 mins (and hasn't started yet)
+  if (diffMins > 0 && diffMins <= 15) {
+    const icon = svg('0 0 24 24', [
+      '<circle cx="12" cy="12" r="10"></circle>',
+      '<polyline points="12 6 12 12 16 14"></polyline>'
+    ], { strokeWidth: 2.5 });
+    icon.classList.add('icon');
+    
+    return el('div', { class: 'alert-banner reveal d4' },
+      icon,
+      el('div', { class: 'content' },
+        el('div', { class: 'title', text: `${target.title} 시작 ${diffMins}분 전` }),
+        el('div', { class: 'desc', text: `곧 ${target.place || '다음 장소'}에서 일정이 시작됩니다. 늦지 않게 이동해주세요.` })
+      )
+    );
   }
-
-  return el('section', { class: 'verse reveal d4' },
-    el('div', { class: 'lbl', text: `2026 Theme · ${v.reference_ko || ''}` }),
-    blockquote,
-    el('cite', {},
-      el('span', { text: v.reference_ko || '' }),
-      el('span', { class: 'en', text: v.text_en || '' }),
-    ),
-  );
+  
+  return null;
 }
 
-function buildToday(events) {
-  const head = el('div', { class: 'head' },
-    el('span', { class: 'title', text: '오늘의 일정' }),
-    el('span', { class: 'meta', text: events.length ? `${events.length} EVENTS` : '' }),
-  );
-
+function buildSegmentedAgenda(events) {
   if (events.length === 0) {
-    return el('section', { class: 'schedule reveal d5' },
-      head,
+    return el('section', { class: 'segmented-agenda reveal d5' },
       el('div', { style: 'padding:32px 16px;text-align:center;color:var(--ink-3);font-size:14px;' },
         '오늘 일정이 없어요.'),
     );
   }
 
-  const rows = events.map(ev => {
-    const titleNode = el('span', { class: 'title' });
-    if (ev._state === 'now') {
-      titleNode.append(el('span', { class: 'live' }), ev.title);
-    } else {
-      titleNode.textContent = ev.title;
-    }
-    return el('div', { class: `ev ${ev._state}`.trim() },
-      el('span', { class: 'time', text: ev.time }),
-      titleNode,
-      el('span', { class: 'place', text: ev.place || '' }),
-    );
+  // Group events by time block
+  const groups = {
+    '오전': [], '오후': [], '저녁': []
+  };
+  
+  events.forEach(ev => {
+    if (!ev.time) return;
+    const hour = parseInt(ev.time.split(':')[0], 10);
+    if (hour < 12) groups['오전'].push(ev);
+    else if (hour < 18) groups['오후'].push(ev);
+    else groups['저녁'].push(ev);
   });
 
-  return el('section', { class: 'schedule reveal d5' }, head, ...rows);
+  const section = el('section', { class: 'segmented-agenda reveal d5' });
+  
+  Object.keys(groups).forEach(block => {
+    if (groups[block].length === 0) return;
+    
+    const title = el('div', { class: 'segment-title', text: block });
+    // add margin-top to titles after the first
+    if (section.children.length > 0) {
+      title.style.marginTop = '32px';
+    }
+    section.append(title);
+    
+    groups[block].forEach(ev => {
+      const row = el('div', { class: `ev minimal ${ev._state}`.trim() },
+        el('span', { class: 'time', text: ev.time }),
+        el('span', { class: 'title', text: ev.title }),
+        el('span', { class: 'place', text: ev.place || '' })
+      );
+      section.append(row);
+    });
+  });
+
+  return section;
 }
+

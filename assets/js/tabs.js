@@ -9,6 +9,11 @@ export function initTabs() {
     if (!VALID.has(tab)) tab = DEFAULT;
     panels.forEach(p => { p.hidden = (p.id !== tab); });
     buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    
+    // Topbar transparency logic for Home layout
+    const topbar = document.querySelector('.topbar');
+    if (topbar) topbar.classList.toggle('transparent', tab === 'home');
+
     if (location.hash !== '#' + tab) {
       history.replaceState(null, '', '#' + tab);
     }
@@ -22,6 +27,11 @@ export function initTabs() {
   window.addEventListener('hashchange', () => {
     const tab = location.hash.replace(/^#/, '') || DEFAULT;
     show(tab);
+  });
+  
+  // Listen for programmatic tab changes (from Action Bar)
+  document.addEventListener('nav-tab', (e) => {
+    show(e.detail);
   });
 
   const initial = location.hash.replace(/^#/, '') || DEFAULT;

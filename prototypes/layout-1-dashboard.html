@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F7F8FA">
+<title>Layout 1 - Dashboard</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<style>
+  /* Layout 1 Specific Styles */
+  .notice-banner {
+    margin: 64px 24px -8px; /* Below topbar */
+    padding: 12px 16px;
+    background: var(--ink);
+    color: var(--card);
+    border-radius: 12px;
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: var(--shadow-sm);
+  }
+  .notice-banner .live-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: #FF4444;
+    animation: blink 1.5s infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .compact-hero {
+    padding: 24px 24px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .compact-hero h1 {
+    font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 4px;
+  }
+  .compact-hero p { font-size: 13px; color: var(--ink-3); }
+
+  .quick-actions {
+    display: flex; gap: 10px; overflow-x: auto;
+    padding: 0 24px 24px;
+    scrollbar-width: none;
+  }
+  .quick-actions::-webkit-scrollbar { display: none; }
+  .action-pill {
+    flex-shrink: 0;
+    background: var(--card);
+    padding: 10px 16px; border-radius: 16px;
+    font-size: 13px; font-weight: 600; color: var(--ink-2);
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .now-playing-card {
+    margin: 0 24px 24px; padding: 20px;
+    background: var(--gradient-brand);
+    color: var(--card);
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+  }
+  .now-playing-card .lbl { font-size: 12px; font-weight: 700; opacity: 0.8; margin-bottom: 8px; }
+  .now-playing-card h2 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
+  .progress-wrap { background: rgba(255,255,255,0.2); height: 4px; border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+  .progress-bar { background: var(--card); height: 100%; width: 65%; border-radius: 2px; }
+  .now-playing-card .time-left { font-size: 12px; font-weight: 600; opacity: 0.8; text-align: right; }
+
+  /* Tab bar height adjustment */
+  body { padding-bottom: 90px; }
+</style>
+</head>
+<body>
+  <div class="mesh" aria-hidden="true"></div>
+  <header class="topbar reveal d1">
+    <span class="brand"><span class="logo"></span>Bridge Retreat</span>
+    <span class="day">Day 01 · 05.29</span>
+  </header>
+
+  <main id="content">
+    <div class="notice-banner reveal d2">
+      <div class="live-dot"></div>
+      저녁 식사가 15분 지연되었습니다.
+    </div>
+
+    <section class="compact-hero reveal d3">
+      <div>
+        <h1>안녕, 박종혁 님</h1>
+        <p>좋은 아침입니다!</p>
+      </div>
+      <div class="meta">
+        <span class="chip accent">301호</span>
+      </div>
+    </section>
+
+    <div class="quick-actions reveal d4">
+      <div class="action-pill"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg> 지도/안내</div>
+      <div class="action-pill"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg> 식단표</div>
+      <div class="action-pill"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> 찬양가사</div>
+    </div>
+
+    <section class="now-playing-card reveal d5">
+      <div class="lbl">진행 중 · 본당</div>
+      <h2>개회 예배</h2>
+      <div class="progress-wrap"><div class="progress-bar"></div></div>
+      <div class="time-left">약 45분 남음</div>
+    </section>
+
+    <section class="schedule reveal d6" style="margin: 0 24px 24px;">
+      <div class="head">
+        <span class="title">오늘의 일정</span>
+      </div>
+      <div class="ev past">
+        <span class="time">15:00</span>
+        <span class="title">도착 및 체크인</span>
+        <span class="place">로비</span>
+      </div>
+      <div class="ev now">
+        <span class="time">16:00</span>
+        <span class="title"><span class="live"></span>개회 예배</span>
+        <span class="place">본당</span>
+      </div>
+      <div class="ev">
+        <span class="time">18:00</span>
+        <span class="title">저녁 식사</span>
+        <span class="place">식당</span>
+      </div>
+    </section>
+
+    <section class="verse reveal d7" style="margin: 0 24px;">
+      <div class="lbl">2026 Theme · 사도행전 2:17</div>
+      <blockquote>말세에 내가 내 영을 모든 육체에 <span class="em">부어 주리니</span></blockquote>
+    </section>
+  </main>
+</body>
+</html>

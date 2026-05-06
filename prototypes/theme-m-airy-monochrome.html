@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F7F8FA">
+<title>Bridge Retreat 2026 - Airy Monochrome</title>
+
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/base.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<style>
+  :root {
+    --bg-base: #F7F8FA;
+    --card:    #FFFFFF;
+    
+    /* Ink scale */
+    --ink:     #222222;
+    --ink-2:   #444444;
+    --ink-3:   #888888;
+    --ink-4:   #CCCCCC;
+    
+    /* Hairlines */
+    --line:    rgba(34,34,34,0.08);
+    --line-2:  rgba(34,34,34,0.04);
+    
+    /* Muted accent palette */
+    --peach:   #555555; 
+    --peach-2: #888888;
+    --lavender:#555555; 
+    --lavender-2: #888888;
+    --mint:    #555555; 
+    --sun:     #555555; 
+    --rose:    #555555; 
+    --signal:  #222222; /* pure black/dark grey for active tabs */
+    
+    /* Flat UI Elevation */
+    --shadow-sm: 0 0 0 1px rgba(34,34,34,0.05);
+    --shadow-md: 0 0 0 1px rgba(34,34,34,0.05), 0 8px 24px rgba(34,34,34,0.02);
+    --shadow-lg: 0 0 0 1px rgba(34,34,34,0.05), 0 16px 48px rgba(34,34,34,0.04);
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh" aria-hidden="true"></div>
+
+<main>
+  <header class="topbar reveal d1">
+    <span class="brand"><span class="logo"></span>Bridge Retreat 2026</span>
+    <span class="day" id="day-pill">—</span>
+  </header>
+
+  <section id="home" class="tab-panel active">
+    <section class="hero reveal d2">
+      <div class="greet">환영합니다</div>
+      <h1>안녕, <strong>박종혁</strong> 님!</h1>
+      <div class="meta">
+        <span class="room">301<span class="ho">호</span></span>
+        <span class="where">3층 동관 · 바다 전망</span>
+      </div>
+    </section>
+
+    <section class="countdown reveal d3">
+      <div class="head">
+        <span class="lbl"><span class="live"></span>다음 일정</span>
+        <span class="at">in 2h 47m</span>
+      </div>
+      <div class="digits">
+        <span id="hh">02</span><span class="colon">:</span><span id="mm">47</span><span class="colon">:</span><span class="ss" id="ss">03</span>
+      </div>
+      <div class="target">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 7v5l3 3"/></svg>
+        </div>
+        <div class="info">
+          <div class="name">저녁 예배</div>
+          <div class="place">본당 · 1층</div>
+        </div>
+        <div class="time">20:00</div>
+      </div>
+    </section>
+
+    <section class="verse reveal d4">
+      <div class="lbl">2026 Theme · 사도행전 / Acts 2:17</div>
+      <blockquote>
+        말세에 내가 내 영을 모든 육체에 <span class="em">부어 주리니</span>
+      </blockquote>
+      <cite>
+        <span>사도행전 2:17</span>
+        <span class="en">I will pour out my Spirit on all people.</span>
+      </cite>
+    </section>
+
+    <section class="schedule reveal d5">
+      <div class="head">
+        <span class="title">오늘의 일정</span>
+        <span class="meta">9 EVENTS</span>
+      </div>
+      <div class="ev past"><span class="time">06:00</span><span class="title">새벽기도</span><span class="place">본당</span></div>
+      <div class="ev past"><span class="time">08:00</span><span class="title">아침식사</span><span class="place">식당</span></div>
+      <div class="ev past"><span class="time">10:00</span><span class="title">첫째 시간 예배</span><span class="place">본당</span></div>
+      <div class="ev past"><span class="time">12:30</span><span class="title">점심식사</span><span class="place">식당</span></div>
+      <div class="ev past"><span class="time">14:30</span><span class="title">소그룹 모임</span><span class="place">각 방</span></div>
+      <div class="ev now"><span class="time">17:00</span><span class="title"><span class="live"></span>둘째 시간 예배</span><span class="place">LIVE</span></div>
+      <div class="ev"><span class="time">18:30</span><span class="title">저녁식사</span><span class="place">식당</span></div>
+      <div class="ev"><span class="time">20:00</span><span class="title">저녁 예배</span><span class="place">본당</span></div>
+      <div class="ev"><span class="time">22:00</span><span class="title">교제의 시간</span><span class="place">휴게실</span></div>
+    </section>
+  </section>
+  <section id="schedule" class="tab-panel" hidden></section>
+  <section id="group"    class="tab-panel" hidden></section>
+</main>
+
+<nav class="tabbar" aria-label="주요 탭">
+  <button class="tab" data-tab="home">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12L12 3l9 9"/>
+      <path d="M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10"/>
+    </svg>
+    홈
+  </button>
+  <button class="tab" data-tab="schedule">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3" y="4" width="18" height="18" rx="2"/>
+      <path d="M16 2v4M8 2v4M3 10h18"/>
+    </svg>
+    일정
+  </button>
+  <button class="tab" data-tab="group">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+    </svg>
+    내 그룹
+  </button>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- <script type="module" src="../assets/js/app.js"></script> -->
+</body>
+</html>

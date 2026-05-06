@@ -12,8 +12,6 @@ if (!session) {
 }
 
 async function bootstrap() {
-  setTopbarDay();
-
   // Load each independently — a missing piece shouldn't kill the whole app.
   const results = await Promise.allSettled([
     loadTheme(), loadSchedule(), loadRoster(), loadCells(),
@@ -29,32 +27,24 @@ async function bootstrap() {
   const roster   = rR.status === 'fulfilled' ? rR.value : [];
   const cells    = cR.status === 'fulfilled' ? cR.value : [];
 
-  setTopbarDay(schedule);
-
   const ctx = { session, theme, schedule, roster, cells };
 
-  // Lazy-import each tab so a render error in one tab doesn't kill the others.
-  try { (await import('./home.js')).renderHome(ctx); }         catch (e) { console.error('home', e); }
-  try { (await import('./schedule.js')).renderSchedule(ctx); } catch (e) { console.error('schedule', e); }
-  try { (await import('./group.js')).renderGroup(ctx); }       catch (e) { console.error('group', e); }
+  // Lazy-import each tab with cache busting so updates show immediately
+  const v = Date.now();
+  try { (await import(`./home.js?v=${v}`)).renderHome(ctx); }         catch (e) { console.error('home', e); }
+  try { (await import(`./schedule.js?v=${v}`)).renderSchedule(ctx); } catch (e) { console.error('schedule', e); }
+  try { (await import(`./group.js?v=${v}`)).renderGroup(ctx); }       catch (e) { console.error('group', e); }
+
+  // Hide splash screen smoothly
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.style.opacity = '0';
+    splash.style.visibility = 'hidden';
+    setTimeout(() => splash.remove(), 600);
+  }
 
   initTabs();
   maybeShowCheckin(session);
-}
-
-function setTopbarDay(schedule) {
-  const today = new Date(getNow());
-  const todayKey = isoDate(today);
-
-  let label = '';
-  if (schedule) {
-    const day = schedule.days.find(d => isoDate(new Date(d.date)) === todayKey);
-    label = day ? day.label : 'Day · —';
-  }
-
-  const dateLabel = `${pad(today.getMonth() + 1)}.${pad(today.getDate())}`;
-  const pill = document.getElementById('day-pill');
-  if (pill) pill.textContent = label ? `${label} · ${dateLabel}` : dateLabel;
 }
 
 function pad(n) { return String(n).padStart(2, '0'); }

@@ -1,34 +1,48 @@
-/* H — Calm. Muted modern palette + type tokens. */
+/* Airy Monochrome + Semantic Tokens */
 :root {
   /* Surfaces */
-  --bg-base: #FBF9F7;
+  --bg-base: #F7F8FA;
   --card:    #FFFFFF;
 
   /* Ink scale */
-  --ink:     #18181C;
-  --ink-2:   #3D3D45;
-  --ink-3:   #71717A;
-  --ink-4:   #A1A1AA;
+  --ink:     #222222;
+  --ink-2:   #444444;
+  --ink-3:   #888888;
+  --ink-4:   #CCCCCC;
 
   /* Hairlines */
-  --line:    rgba(24,24,28,0.08);
-  --line-2:  rgba(24,24,28,0.05);
+  --line:    rgba(34,34,34,0.08);
+  --line-2:  rgba(34,34,34,0.04);
 
-  /* Muted accent palette — used in gradients + glows */
-  --peach:    #D4A691;  /* dusty terracotta */
-  --peach-2:  #E8CDB8;  /* soft terracotta  */
-  --lavender: #B4BED1;  /* muted periwinkle */
-  --lavender-2: #D7DDE7;
-  --mint:     #AEC2B0;  /* muted sage       */
-  --sun:      #D9C5A2;  /* muted gold       */
-  --rose:     #D4A2A6;  /* dusty rose       */
-  --signal:   #BC6E5B;  /* muted coral — live indicator only */
+  /* Semantic UI Tokens - Replaces hardcoded gradients & backgrounds */
+  --mesh-c1: rgba(220,220,220,0.4);
+  --mesh-c2: rgba(230,230,230,0.4);
+  --mesh-c3: rgba(200,200,200,0.3);
+  --mesh-c4: rgba(240,240,240,0.4);
 
-  /* Elevation */
-  --shadow-sm: 0 1px 2px rgba(24,24,28,0.04), 0 4px 12px rgba(24,24,28,0.04);
-  --shadow-md: 0 4px 20px rgba(24,24,28,0.06), 0 12px 40px rgba(24,24,28,0.06);
-  --shadow-lg: 0 16px 56px rgba(24,24,28,0.10), 0 8px 24px rgba(24,24,28,0.06);
+  --gradient-brand: linear-gradient(135deg, #444444, #222222);
+  --gradient-countdown: linear-gradient(150deg, #FAFAFA 0%, #F0F0F0 50%, #E8E8E8 100%);
+  --gradient-countdown-ready: linear-gradient(150deg, #E0E0E0 0%, #D0D0D0 50%, #C0C0C0 100%);
+  --gradient-ev-now: linear-gradient(135deg, rgba(34,34,34,0.04), rgba(34,34,34,0.08));
 
-  /* Type stack — Pretendard primary, Inter for English fallback */
+  --bg-glass: rgba(255,255,255,0.85);
+  --bg-glass-target: rgba(255,255,255,0.7);
+  --bg-accent-soft: rgba(34,34,34,0.05);
+  --bg-accent-soft-hover: rgba(34,34,34,0.08);
+
+  --shadow-color-brand: rgba(34,34,34,0.15);
+
+  --badge-bg: var(--ink);
+  --badge-color: #ffffff;
+  
+  --signal: #222222;
+  --signal-bg: #FFFFFF;
+
+  /* Flat UI Elevation */
+  --shadow-sm: 0 0 0 1px rgba(34,34,34,0.05);
+  --shadow-md: 0 0 0 1px rgba(34,34,34,0.05), 0 8px 24px rgba(34,34,34,0.02);
+  --shadow-lg: 0 0 0 1px rgba(34,34,34,0.05), 0 16px 48px rgba(34,34,34,0.04);
+
+  /* Type stack */
   --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }

@@ -42,7 +42,7 @@ export function renderSchedule(ctx) {
       el('span', { class: 'date', text: formatDate(dKey) }),
     );
 
-    const card = el('section', { class: 'schedule' },
+    const card = el('div', { class: 'segmented-agenda' },
       ...events.map(buildEventRow),
     );
 
@@ -58,7 +58,7 @@ function buildEventRow(ev) {
   } else {
     titleNode.textContent = ev.title;
   }
-  return el('div', { class: `ev ${ev._state}`.trim() },
+  return el('div', { class: `ev minimal ${ev._state}`.trim() },
     el('span', { class: 'time', text: ev.time }),
     titleNode,
     el('span', { class: 'place', text: ev.place || '' }),
