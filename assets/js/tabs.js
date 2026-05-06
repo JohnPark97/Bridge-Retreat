@@ -17,7 +17,23 @@ export function initTabs() {
     if (location.hash !== '#' + tab) {
       history.replaceState(null, '', '#' + tab);
     }
-    window.scrollTo({ top: 0, behavior: 'instant' });
+
+    if (tab === 'schedule') {
+      setTimeout(() => {
+        const liveEvent = document.querySelector('#schedule .ev.now');
+        const todaySection = document.querySelector('#schedule .day-section.today');
+        
+        if (liveEvent) {
+          liveEvent.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else if (todaySection) {
+          todaySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      }, 50);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
 
   buttons.forEach(b => {

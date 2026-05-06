@@ -32,7 +32,7 @@ export function renderHome(ctx) {
   };
   updateDynamic();
 
-  root.append(hero, meta, checkin, dynamicContainer);
+  root.append(hero, meta, ...(checkin ? [checkin] : []), dynamicContainer);
 
   // Update dynamic parts every minute
   setInterval(updateDynamic, 60 * 1000);
@@ -116,39 +116,15 @@ function buildSegmentedAgenda(events) {
     );
   }
 
-  // Group events by time block
-  const groups = {
-    '오전': [], '오후': [], '저녁': []
-  };
-  
-  events.forEach(ev => {
-    if (!ev.time) return;
-    const hour = parseInt(ev.time.split(':')[0], 10);
-    if (hour < 12) groups['오전'].push(ev);
-    else if (hour < 18) groups['오후'].push(ev);
-    else groups['저녁'].push(ev);
-  });
-
   const section = el('section', { class: 'segmented-agenda reveal d5' });
   
-  Object.keys(groups).forEach(block => {
-    if (groups[block].length === 0) return;
-    
-    const title = el('div', { class: 'segment-title', text: block });
-    // add margin-top to titles after the first
-    if (section.children.length > 0) {
-      title.style.marginTop = '32px';
-    }
-    section.append(title);
-    
-    groups[block].forEach(ev => {
-      const row = el('div', { class: `ev minimal ${ev._state}`.trim() },
-        el('span', { class: 'time', text: ev.time }),
-        el('span', { class: 'title', text: ev.title }),
-        el('span', { class: 'place', text: ev.place || '' })
-      );
-      section.append(row);
-    });
+  events.forEach(ev => {
+    const row = el('div', { class: `ev minimal ${ev._state}`.trim() },
+      el('span', { class: 'time', text: ev.time }),
+      el('span', { class: 'title', text: ev.title }),
+      el('span', { class: 'place', text: ev.place || '' })
+    );
+    section.append(row);
   });
 
   return section;
@@ -157,11 +133,11 @@ function buildSegmentedAgenda(events) {
 // ─── Inline Check-in ─────────────────────────
 
 function buildInlineCheckin(session) {
-  const container = el('div', { class: 'inline-checkin reveal d4' });
-
   if (session.checked_in_at) {
-    return container;
+    return null;
   }
+
+  const container = el('div', { class: 'inline-checkin reveal d4' });
 
   // Not checked in — gentle prompt
   const btn = el('button', { class: 'checkin-btn', type: 'button' }, '체크인');
@@ -176,7 +152,13 @@ function buildInlineCheckin(session) {
     try {
       const ts = await submitCheckin(session.id);
       patchSession({ checked_in_at: ts });
-      container.remove();
+      // Replace with room direction
+      container.replaceChildren(
+        el('div', { class: 'checkin-done' },
+          el('span', { text: `환영합니다! ${session.room ? session.room + '호' : '배정된 방'}으로 이동해 주세요.` }),
+        )
+      );
+      setTimeout(() => container.remove(), 5000);
       showToast('체크인 완료!');
     } catch (err) {
       console.error('checkin failed', err);

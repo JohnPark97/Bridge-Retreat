@@ -98,7 +98,7 @@ async function bootstrap() {
   }
 
   // Build tab navigation + panels
-  const panels = {
+  let panels = {
     checkin: buildCheckinView(roster, schedule),
     groups:  buildGroupsView(roster, cells),
     rooms:   buildRoomsView(roster),
@@ -110,7 +110,38 @@ async function bootstrap() {
   content.append(tabBar, panels.checkin, panels.groups, panels.rooms, logoutFooter);
 
   // Show first tab
-  switchAdminTab('checkin', panels);
+  let activeTab = 'checkin';
+  switchAdminTab(activeTab, panels);
+
+  // Auto-refresh every 30 seconds
+  setInterval(async () => {
+    try {
+      const [rR2, cR2] = await Promise.allSettled([loadRoster(), loadCells()]);
+      const freshRoster = rR2.status === 'fulfilled' ? rR2.value : roster;
+      const freshCells  = cR2.status === 'fulfilled' ? cR2.value : cells;
+
+      // Track which tab is active
+      const currentTab = document.querySelector('.admin-tab.active');
+      activeTab = currentTab?.dataset?.tab || activeTab;
+
+      // Rebuild panels
+      const newPanels = {
+        checkin: buildCheckinView(freshRoster, schedule),
+        groups:  buildGroupsView(freshRoster, freshCells),
+        rooms:   buildRoomsView(freshRoster),
+      };
+
+      // Swap in new panels
+      panels.checkin.replaceWith(newPanels.checkin);
+      panels.groups.replaceWith(newPanels.groups);
+      panels.rooms.replaceWith(newPanels.rooms);
+      panels = newPanels;
+
+      switchAdminTab(activeTab, panels);
+    } catch (e) {
+      console.warn('auto-refresh failed', e);
+    }
+  }, 30000);
 }
 
 // ─── Tab Navigation ──────────────────────────
@@ -162,7 +193,7 @@ function buildCheckinView(roster, schedule) {
   const statsSection = el('div', { class: 'admin-stats reveal d3' },
     el('div', { class: 'admin-stats-number' },
       el('span', { text: String(checked) }),
-      el('span', { style: 'color:var(--ink-4); font-weight:700;', text: ` / ${total}` }),
+      el('span', { style: 'color:var(--ink-2); font-weight:700;', text: ` / ${total}` }),
     ),
     el('div', { style: 'font-size:13px; font-weight:700; color:var(--ink-3); margin-bottom:12px;', text: `${pct}% 체크인 완료` }),
     el('div', { class: 'bar', style: 'height:6px;' },
@@ -177,7 +208,7 @@ function buildCheckinView(roster, schedule) {
       const timer = el('span', { style: 'font-weight:800; font-size:18px; font-feature-settings:"tnum" 1; letter-spacing:-0.02em; color:var(--ink);', text: '—' });
       const nextBlock = el('div', { style: 'margin-top:16px; padding-top:14px; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;' },
         el('div', {},
-          el('div', { style: 'font-size:11px; font-weight:700; color:var(--ink-4); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:2px;', text: '다음 일정' }),
+          el('div', { style: 'font-size:11px; font-weight:700; color:var(--ink-2); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:2px;', text: '다음 일정' }),
           el('div', { style: 'font-weight:700; font-size:14px; color:var(--ink);', text: `${target.title} · ${target.time}` }),
         ),
         timer,
@@ -207,7 +238,7 @@ function buildCheckinView(roster, schedule) {
 
   // Roster list
   const list = el('div', { style: 'margin-top:8px;' });
-  const meta = el('span', { style: 'font-size:12px; font-weight:600; color:var(--ink-4);' });
+  const meta = el('span', { style: 'font-size:12px; font-weight:600; color:var(--ink-2);' });
 
   function render(query) {
     list.replaceChildren();
@@ -241,7 +272,7 @@ function buildCheckinView(roster, schedule) {
   render('');
 
   const listHeader = el('div', { style: 'display:flex; align-items:baseline; justify-content:space-between; padding:16px 8px 8px;' },
-    el('span', { style: 'font-size:12px; font-weight:700; color:var(--ink-4); letter-spacing:0.05em; text-transform:uppercase;', text: '명단' }),
+    el('span', { style: 'font-size:12px; font-weight:700; color:var(--ink-2); letter-spacing:0.05em; text-transform:uppercase;', text: '명단' }),
     meta,
   );
 
@@ -287,7 +318,7 @@ function buildGroupsView(roster, cells) {
     return members.length > 0 && members.every(m => !!m.checked_in_at);
   }).length;
 
-  panel.append(el('div', { style: 'padding:0 8px 16px; font-size:12px; font-weight:700; color:var(--ink-4); letter-spacing:0.05em; text-transform:uppercase;' },
+  panel.append(el('div', { style: 'padding:0 8px 16px; font-size:12px; font-weight:700; color:var(--ink-2); letter-spacing:0.05em; text-transform:uppercase;' },
     `${totalGroups}개 조 · ${allCheckedGroups}개 완료`
   ));
 
@@ -319,11 +350,11 @@ function buildGroupsView(roster, cells) {
     const others = members.filter(m => !m.is_leader);
 
     if (leaders.length > 0) {
-      body.append(el('div', { style: 'font-size:11px; font-weight:700; color:var(--ink-4); letter-spacing:0.05em; text-transform:uppercase; padding:8px 0 4px;', text: '리더' }));
+      body.append(el('div', { style: 'font-size:11px; font-weight:700; color:var(--ink-2); letter-spacing:0.05em; text-transform:uppercase; padding:8px 0 4px;', text: '리더' }));
       leaders.forEach(m => body.append(buildPersonRow(m)));
     }
     if (others.length > 0) {
-      body.append(el('div', { style: 'font-size:11px; font-weight:700; color:var(--ink-4); letter-spacing:0.05em; text-transform:uppercase; padding:8px 0 4px;', text: '그룹원' }));
+      body.append(el('div', { style: 'font-size:11px; font-weight:700; color:var(--ink-2); letter-spacing:0.05em; text-transform:uppercase; padding:8px 0 4px;', text: '그룹원' }));
       others.forEach(m => body.append(buildPersonRow(m)));
     }
 
@@ -371,7 +402,7 @@ function buildRoomsView(roster) {
     return a.localeCompare(b, 'ko');
   });
 
-  panel.append(el('div', { style: 'padding:0 8px 16px; font-size:12px; font-weight:700; color:var(--ink-4); letter-spacing:0.05em; text-transform:uppercase;' },
+  panel.append(el('div', { style: 'padding:0 8px 16px; font-size:12px; font-weight:700; color:var(--ink-2); letter-spacing:0.05em; text-transform:uppercase;' },
     `${roomKeys.length}개 방`
   ));
 
@@ -384,9 +415,9 @@ function buildRoomsView(roster) {
     const sectionLabel = el('div', { style: 'display:flex; align-items:baseline; justify-content:space-between; padding:20px 8px 8px;' },
       el('span', { style: 'font-size:16px; font-weight:800; color:var(--ink); letter-spacing:-0.01em;' },
         roomLabel,
-        allDone ? el('span', { style: 'margin-left:8px; font-size:10px; font-weight:800; color:var(--ink-4); border:1px solid var(--line); padding:2px 6px; border-radius:99px; vertical-align:middle;', text: '✓' }) : null,
+        allDone ? el('span', { style: 'margin-left:8px; font-size:10px; font-weight:800; color:var(--ink-2); border:1px solid var(--line); padding:2px 6px; border-radius:99px; vertical-align:middle;', text: '✓' }) : null,
       ),
-      el('span', { style: 'font-size:12px; font-weight:600; color:var(--ink-4);', text: `${checked}/${members.length}` }),
+      el('span', { style: 'font-size:12px; font-weight:600; color:var(--ink-2);', text: `${checked}/${members.length}` }),
     );
 
     const memberList = el('div');
@@ -415,10 +446,10 @@ function buildPersonRow(p) {
     statusDot,
     el('div', { style: 'flex:1; min-width:0;' },
       el('div', { style: `font-size:15px; font-weight:${checkedIn ? '500' : '700'}; color:${checkedIn ? 'var(--ink-3)' : 'var(--ink)'}; letter-spacing:-0.01em;`, text: nameText }),
-      details ? el('div', { style: 'font-size:12px; font-weight:600; color:var(--ink-4); margin-top:1px;', text: details }) : null,
+      details ? el('div', { style: 'font-size:12px; font-weight:600; color:var(--ink-2); margin-top:1px;', text: details }) : null,
     ),
     checkedIn
-      ? el('span', { style: 'font-size:11px; font-weight:600; color:var(--ink-4);', text: formatCheckinTime(p.checked_in_at) })
+      ? el('span', { style: 'font-size:11px; font-weight:600; color:var(--ink-2);', text: formatCheckinTime(p.checked_in_at) })
       : el('span', { style: 'font-size:11px; font-weight:700; color:var(--signal, #E74C3C);', text: '미체크인' }),
   );
 }

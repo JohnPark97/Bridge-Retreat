@@ -38,13 +38,13 @@ function buildGroupInfo(cell, fallbackName) {
   const pinIcon = svg('0 0 24 24', [...ICON_PIN, ...PIN_DOT], { strokeWidth: 2 });
   pinIcon.style.width = '16px';
   pinIcon.style.height = '16px';
-  pinIcon.style.color = 'var(--ink-3)';
+  pinIcon.style.color = 'var(--ink-2)';
   pinIcon.style.flexShrink = '0';
 
   return el('section', { class: 'journal-hero reveal d2', style: 'margin-bottom: 0;' },
     el('div', { class: 'date' }, '내 조원'),
     el('blockquote', { style: 'font-size: 28px; font-style: normal; margin-bottom: 12px; font-weight: 700;' }, cellName),
-    el('cite', { style: 'font-size: 13px; font-weight: 600; color: var(--ink-3); display: flex; align-items: center; justify-content: center; gap: 6px;' },
+    el('cite', { style: 'font-size: 13px; font-weight: 600; color: var(--ink-2); display: flex; align-items: center; justify-content: center; gap: 6px;' },
       pinIcon,
       meetingRoom
     )
@@ -67,7 +67,7 @@ function buildMembers(members, session) {
   const leaders = members.filter(m => m.is_leader);
   const others  = members.filter(m => !m.is_leader);
 
-  const labelStyle = 'font-size: 12px; font-weight: 700; color: var(--ink-4); margin: 24px 8px 12px; letter-spacing: 0.05em; text-transform: uppercase;';
+  const labelStyle = 'font-size: 12px; font-weight: 700; color: var(--ink-2); margin: 24px 8px 12px; letter-spacing: 0.05em; text-transform: uppercase;';
   const gridStyle = 'display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 8px; margin-bottom: 24px;';
   
   const children = [];
@@ -93,7 +93,7 @@ function buildMemberCell(person, session) {
   
   return el('div', { style: 'display: flex; align-items: baseline; gap: 8px;' },
     nameNode,
-    el('span', { style: 'font-size: 12px; font-weight: 600; color: var(--ink-4);', text: person.room ? `${person.room}호` : '' })
+    el('span', { style: 'font-size: 12px; font-weight: 600; color: var(--ink-2);', text: person.room ? `${person.room}호` : '' })
   );
 }
 
