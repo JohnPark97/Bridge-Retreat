@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bridge Retreat — Theme Previews</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
+    background: #FAFAF9;
+    color: #0A0A0F;
+    padding: 32px 20px 80px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+  .sub {
+    font-size: 14px;
+    color: #5C5C66;
+    margin-bottom: 28px;
+  }
+  .group {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9090A0;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 28px 0 12px;
+  }
+  .grid { display: grid; gap: 12px; max-width: 480px; }
+  a.card {
+    display: block;
+    padding: 18px 20px;
+    background: #FFFFFF;
+    border: 1px solid rgba(10,10,15,0.08);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform .15s ease, border-color .15s ease;
+    box-shadow: 0 1px 2px rgba(10,10,15,0.04);
+  }
+  a.card:active { transform: scale(0.99); }
+  .name {
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 4px;
+    letter-spacing: -0.015em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .name .badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #2D4DFF;
+    background: #EEF1FF;
+    padding: 3px 7px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+  .desc {
+    font-size: 13.5px;
+    color: #5C5C66;
+    line-height: 1.5;
+  }
+  .swatch {
+    display: inline-flex;
+    gap: 4px;
+    margin-top: 12px;
+  }
+  .swatch span {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  /* Theme-specific card backgrounds (preview hint) */
+  .card.h-calm { background: linear-gradient(135deg, #FFE4D8 0%, #F3DCFF 50%, #D4F3E8 100%); }
+  .card.i-aurora {
+    background: #0A0B10; color: #F4F4F7;
+    border-color: rgba(255,255,255,0.1);
+  }
+  .card.i-aurora .desc { color: #8C8E98; }
+  .card.j-pure { background: #FFFFFF; }
+  .card.j-pure .name .badge { background: #2D4DFF; color: #fff; }
+</style>
+</head>
+<body>
+  <h1>Bridge Retreat</h1>
+  <p class="sub">Theme previews · Tap to compare on phone</p>
+
+  <div class="group">★ New — Big Tech apps inspired</div>
+  <div class="grid">
+
+    <a class="card h-calm" href="theme-h-calm.html" style="background:linear-gradient(135deg,#F0DECF 0%,#DFE2EC 50%,#DAE3D7 100%);">
+      <div class="name">H — Calm <span class="badge">★ MUTED</span></div>
+      <div class="desc">Headspace / Apple Fitness vibe with refined muted palette. Dusty terracotta + periwinkle + sage gradient mesh, big rounded white cards, single warm coral signal.</div>
+      <div class="swatch">
+        <span style="background:#D4A691"></span>
+        <span style="background:#B4BED1"></span>
+        <span style="background:#AEC2B0"></span>
+        <span style="background:#BC6E5B"></span>
+      </div>
+    </a>
+
+    <a class="card i-aurora" href="theme-i-aurora.html">
+      <div class="name">I — Aurora <span class="badge" style="background:rgba(124,255,196,0.15);color:#7CFFC4;">★ NEW</span></div>
+      <div class="desc">Linear / Vercel premium dark mode. Aurora gradient at top, glass cards on rich black, JetBrains Mono numerals, electric mint glow on live event.</div>
+      <div class="swatch">
+        <span style="background:#0A0B10;border-color:rgba(255,255,255,0.2)"></span>
+        <span style="background:#7CFFC4"></span>
+        <span style="background:#B79FFF"></span>
+        <span style="background:#6EC4FF"></span>
+      </div>
+    </a>
+
+    <a class="card j-pure" href="theme-j-pure.html">
+      <div class="name">J — Pure <span class="badge">★ NEW</span></div>
+      <div class="desc">Notion / Stripe / Apple Wallet. Pure white cards, electric Spirit-blue accent, bottom-sheet check-in, generous spacing, friendly + professional.</div>
+      <div class="swatch">
+        <span style="background:#FAFAF9"></span>
+        <span style="background:#0A0A0F"></span>
+        <span style="background:#2D4DFF"></span>
+        <span style="background:#FF3D5C"></span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="group">Earlier explorations</div>
+  <div class="grid">
+
+    <a class="card" href="theme-g-elevated.html" style="border-color:#3D5950;background:linear-gradient(135deg,#F8F2E7,#EFE6D8);">
+      <div class="name">G — 충만 / Overflow</div>
+      <div class="desc">Editorial / Aesop direction. Drifting gradient mesh, Fraunces serif + Noto Serif KR, asymmetric glass countdown, 충 watermark.</div>
+      <div class="swatch">
+        <span style="background:#EFE6D8"></span>
+        <span style="background:#1F2A28"></span>
+        <span style="background:#3D5950"></span>
+        <span style="background:#D67862"></span>
+      </div>
+    </a>
+
+    <a class="card" href="theme-d-quiet-grace.html">
+      <div class="name">D — Quiet Grace</div>
+      <div class="desc">Bone + olive. Aesop / devotional. Generous whitespace, weight-200 thin headings, Korean watermarks.</div>
+      <div class="swatch">
+        <span style="background:#f4f1ea"></span>
+        <span style="background:#1a1a17"></span>
+        <span style="background:#3d5240"></span>
+        <span style="background:#6b6862"></span>
+      </div>
+    </a>
+
+    <a class="card" href="theme-e-still-water.html">
+      <div class="name">E — Still Water</div>
+      <div class="desc">Near-monochrome. Muji / monastic. 0.5px hairlines, tabular schedule grid, single brick-red signal.</div>
+      <div class="swatch">
+        <span style="background:#fafaf8"></span>
+        <span style="background:#0f0f0f"></span>
+        <span style="background:#c44536"></span>
+        <span style="background:#8c8c88"></span>
+      </div>
+    </a>
+
+    <a class="card" href="theme-f-soft-bloom.html">
+      <div class="name">F — Soft Bloom</div>
+      <div class="desc">Warm cream + dusty rose. Notion / café app. 12px radius, soft shadow, gentle background gradient.</div>
+      <div class="swatch">
+        <span style="background:#f8f4ee"></span>
+        <span style="background:#2b2522"></span>
+        <span style="background:#b85450"></span>
+        <span style="background:#8b7e76"></span>
+      </div>
+    </a>
+
+  </div>
+</body>
+</html>

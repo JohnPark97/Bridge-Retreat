@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bridge Retreat · Calm</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    --bg-base: #FBF9F7;
+    --ink: #18181C;
+    --ink-2: #3D3D45;
+    --ink-3: #71717A;
+    --ink-4: #A1A1AA;
+    --line: rgba(24,24,28,0.08);
+    --line-2: rgba(24,24,28,0.05);
+    --card: #FFFFFF;
+
+    --peach: #D4A691;       /* dusty terracotta */
+    --peach-2: #E8CDB8;     /* soft terracotta */
+    --lavender: #B4BED1;    /* muted periwinkle */
+    --lavender-2: #D7DDE7;  /* soft periwinkle */
+    --mint: #AEC2B0;        /* muted sage */
+    --sun: #D9C5A2;         /* muted gold */
+    --rose: #D4A2A6;        /* dusty rose */
+    --signal: #BC6E5B;      /* muted coral — live indicator only */
+
+    --shadow-sm: 0 1px 2px rgba(24,24,28,0.04), 0 4px 12px rgba(24,24,28,0.04);
+    --shadow-md: 0 4px 20px rgba(24,24,28,0.06), 0 12px 40px rgba(24,24,28,0.06);
+    --shadow-lg: 0 16px 56px rgba(24,24,28,0.10), 0 8px 24px rgba(24,24,28,0.06);
+
+    --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { background: var(--bg-base); height: 100%; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated gradient mesh — Headspace / Apple Fitness style */
+  .mesh {
+    position: fixed; inset: 0;
+    z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 50% at 12% 8%,  rgba(212,166,145,0.55), transparent 70%),
+      radial-gradient(55% 45% at 92% 22%, rgba(180,190,209,0.50), transparent 70%),
+      radial-gradient(60% 60% at 80% 95%, rgba(174,194,176,0.40), transparent 70%),
+      radial-gradient(50% 40% at 18% 88%, rgba(217,197,162,0.40), transparent 70%),
+      var(--bg-base);
+    background-size: 220% 220%, 240% 220%, 220% 240%, 200% 200%, 100% 100%;
+    background-position: 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%;
+    animation: mesh-drift 60s ease-in-out infinite alternate;
+    filter: saturate(92%);
+  }
+  @keyframes mesh-drift {
+    0%   { background-position: 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%; }
+    50%  { background-position: 30% 20%, 70% 30%, 70% 80%, 25% 75%, 0% 0%; }
+    100% { background-position: 10% 35%, 85% 15%, 90% 92%, 8% 90%, 0% 0%; }
+  }
+
+  main { position: relative; z-index: 2; padding: 20px 16px 96px; max-width: 460px; margin: 0 auto; }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(12px); animation: r .6s cubic-bezier(.2,.7,.2,1) forwards; }
+  .reveal.d1 { animation-delay: .04s; } .reveal.d2 { animation-delay: .14s; }
+  .reveal.d3 { animation-delay: .24s; } .reveal.d4 { animation-delay: .34s; }
+  .reveal.d5 { animation-delay: .44s; }
+  @keyframes r { to { opacity: 1; transform: none; } }
+
+  /* Topbar */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 8px;
+    margin-bottom: 16px;
+  }
+  .topbar .brand {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 14px; color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .topbar .brand .logo {
+    width: 22px; height: 22px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--peach), var(--rose), var(--lavender));
+  }
+  .topbar .day {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    padding: 8px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; color: var(--ink-2);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Hero card */
+  .hero {
+    position: relative;
+    padding: 28px 24px 26px;
+    border-radius: 28px;
+    background: var(--card);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(80% 60% at 100% 0%, rgba(212,166,145,0.18), transparent 60%),
+      radial-gradient(60% 50% at 0% 100%, rgba(180,190,209,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .hero > * { position: relative; }
+  .hero .greet {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+  .hero .greet .pip {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--peach);
+    animation: ping 2.4s ease-in-out infinite;
+  }
+  @keyframes ping {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(212,166,145,0.5); }
+    50%      { box-shadow: 0 0 0 6px rgba(212,166,145,0); }
+  }
+  .hero h1 {
+    font-weight: 800; font-size: 36px; line-height: 1.12;
+    letter-spacing: -0.035em;
+    margin-bottom: 22px;
+    color: var(--ink);
+  }
+  .hero h1 .gr {
+    background: linear-gradient(135deg, var(--peach) 0%, var(--rose) 60%, var(--lavender) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .meta {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .hero .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: rgba(24,24,28,0.05);
+    border-radius: 999px;
+    font-size: 13px; font-weight: 600; color: var(--ink);
+  }
+  .hero .chip.accent {
+    background: linear-gradient(135deg, var(--peach), var(--rose));
+    color: #fff;
+    box-shadow: 0 4px 14px -4px rgba(188,110,91,0.45);
+  }
+  .hero .chip svg { width: 14px; height: 14px; }
+
+  /* Countdown card */
+  .countdown {
+    position: relative;
+    padding: 24px 24px 22px;
+    border-radius: 28px;
+    background: linear-gradient(150deg, #F0DECF 0%, #DFE2EC 50%, #DAE3D7 100%);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .countdown::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(120% 80% at 50% -20%, rgba(255,255,255,0.6), transparent 50%);
+    pointer-events: none;
+  }
+  .countdown > * { position: relative; }
+  .countdown .head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+  }
+  .countdown .lbl {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; color: var(--ink);
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .countdown .lbl .live {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #BC6E5B;
+    animation: live 1.4s ease-in-out infinite;
+  }
+  @keyframes live {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%      { transform: scale(1.3); opacity: 0.6; }
+  }
+  .countdown .at {
+    font-size: 13px; font-weight: 600; color: var(--ink-2);
+  }
+  .countdown .digits {
+    display: flex; align-items: baseline; gap: 4px;
+    font-feature-settings: "tnum" 1;
+    font-weight: 800;
+    font-size: clamp(60px, 17vw, 84px);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: var(--ink);
+    margin-bottom: 18px;
+  }
+  .countdown .digits .colon { color: rgba(24,24,28,0.4); margin: 0 2px; transform: translateY(-0.06em); }
+  .countdown .digits .ms { font-size: 0.55em; color: var(--ink-3); margin-left: 6px; align-self: end; padding-bottom: 0.3em; }
+  .countdown .target {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border-radius: 18px;
+  }
+  .countdown .target .icon {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--peach), var(--rose));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; flex-shrink: 0;
+    box-shadow: 0 4px 12px -4px rgba(188,110,91,0.55);
+  }
+  .countdown .target .icon svg { width: 18px; height: 18px; }
+  .countdown .target .info { flex: 1; min-width: 0; }
+  .countdown .target .name { font-weight: 700; font-size: 16px; color: var(--ink); }
+  .countdown .target .place { font-size: 13px; color: var(--ink-3); margin-top: 1px; }
+  .countdown .target .time { font-weight: 700; font-size: 15px; color: var(--ink); font-feature-settings: "tnum" 1; }
+
+  /* Verse card */
+  .verse {
+    padding: 28px 24px;
+    border-radius: 28px;
+    background: var(--card);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verse::before {
+    content: ""; position: absolute; top: 0; right: 0;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(180,190,209,0.18), transparent 60%);
+    pointer-events: none;
+  }
+  .verse .lbl {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    background: rgba(180,190,209,0.22);
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700; color: #5A6680;
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .verse blockquote {
+    font-weight: 700; font-size: 22px; line-height: 1.55;
+    letter-spacing: -0.02em; color: var(--ink);
+    margin-bottom: 18px;
+    position: relative;
+  }
+  .verse blockquote .em {
+    background: linear-gradient(135deg, var(--peach), var(--rose));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  .verse cite {
+    display: flex; align-items: center; justify-content: space-between;
+    font-style: normal; font-size: 13px; font-weight: 600; color: var(--ink-3);
+    padding-top: 18px;
+    border-top: 1px solid var(--line-2);
+  }
+  .verse cite .en { font-size: 12px; color: var(--ink-4); font-weight: 500; }
+
+  /* Schedule card */
+  .schedule {
+    padding: 22px 8px 12px;
+    border-radius: 28px;
+    background: var(--card);
+    box-shadow: var(--shadow-md);
+  }
+  .schedule .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 0 16px 16px;
+  }
+  .schedule .head .title { font-weight: 700; font-size: 17px; color: var(--ink); }
+  .schedule .head .meta { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+  .ev {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    column-gap: 14px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    transition: background .2s;
+  }
+  .ev .time {
+    font-weight: 700; font-size: 14px; font-feature-settings: "tnum" 1;
+    color: var(--ink);
+  }
+  .ev .title { font-weight: 600; font-size: 16px; color: var(--ink); }
+  .ev .place {
+    font-size: 12px; font-weight: 600; color: var(--ink-3);
+    background: rgba(24,24,28,0.05); padding: 4px 10px; border-radius: 999px;
+  }
+  .ev.past .time, .ev.past .title { color: var(--ink-4); }
+  .ev.past .title { font-weight: 500; }
+  .ev.past .place { background: transparent; color: var(--ink-4); padding: 0; }
+
+  .ev.now {
+    background: linear-gradient(135deg, rgba(212,166,145,0.10), rgba(188,110,91,0.10));
+    position: relative;
+    overflow: hidden;
+  }
+  .ev.now::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(90deg, var(--peach), var(--rose));
+    width: 4px; right: auto;
+  }
+  .ev.now .time { color: var(--signal); }
+  .ev.now .title { font-weight: 700; }
+  .ev.now .place {
+    background: linear-gradient(135deg, var(--peach), var(--rose));
+    color: #fff; box-shadow: 0 4px 12px -4px rgba(188,110,91,0.5);
+  }
+  .ev.now .live {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: #BC6E5B; margin-right: 6px; vertical-align: 2px;
+    animation: live 1.4s ease-in-out infinite;
+  }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(251,249,247,0.55);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    z-index: 50;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    transition: opacity .35s cubic-bezier(.2,.7,.2,1);
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay-card {
+    position: relative;
+    max-width: 380px; width: 100%;
+    padding: 32px 24px 24px;
+    background: var(--card);
+    border-radius: 28px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .overlay-card::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(80% 50% at 50% 0%, rgba(212,166,145,0.20), transparent 60%);
+    pointer-events: none;
+  }
+  .overlay-card > * { position: relative; }
+  .overlay-card .icon {
+    width: 56px; height: 56px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--peach), var(--rose), var(--lavender));
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px -6px rgba(188,110,91,0.5);
+  }
+  .overlay-card .icon span {
+    color: #fff; font-weight: 800; font-size: 22px; letter-spacing: -0.02em;
+  }
+  .overlay-card h2 {
+    font-weight: 800; font-size: 22px; line-height: 1.3;
+    letter-spacing: -0.02em; color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .overlay-card p {
+    font-size: 14px; line-height: 1.6; color: var(--ink-3);
+    margin-bottom: 24px;
+  }
+  .btn {
+    display: block; width: 100%;
+    padding: 16px 22px;
+    background: linear-gradient(135deg, var(--peach), var(--rose));
+    color: #fff;
+    border: none; border-radius: 999px;
+    font-family: inherit; font-weight: 700; font-size: 15px;
+    cursor: pointer; transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 8px 24px -8px rgba(188,110,91,0.6);
+    letter-spacing: -0.01em;
+    min-height: 56px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-link {
+    display: block; width: 100%; margin-top: 4px;
+    padding: 14px;
+    background: none; color: var(--ink-3);
+    border: none; cursor: pointer;
+    font-family: inherit; font-weight: 600; font-size: 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mesh, .hero .greet .pip, .countdown .lbl .live, .ev.now .live {
+      animation: none !important;
+    }
+    .reveal { opacity: 1; transform: none; animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mesh" aria-hidden="true"></div>
+
+<div class="overlay" id="overlay" role="dialog">
+  <div class="overlay-card">
+    <div class="icon"><span>301</span></div>
+    <h2>방에 잘 도착하셨나요?</h2>
+    <p>301호에 짐을 두셨다면 체크인을 해 주세요. 도움이 필요하면 언제든 안내 데스크를 찾아주세요.</p>
+    <button class="btn" onclick="dismissOverlay()">체크인 완료</button>
+    <button class="btn-link" onclick="dismissOverlay()">잠시 후에 할게요</button>
+  </div>
+</div>
+
+<main>
+
+  <header class="topbar reveal d1">
+    <span class="brand"><span class="logo"></span>Bridge Retreat</span>
+    <span class="day">Day 02 · 05.30</span>
+  </header>
+
+  <section class="hero reveal d2">
+    <div class="greet"><span class="pip"></span>환영합니다</div>
+    <h1>안녕,<br><span class="gr">박존</span> 님!</h1>
+    <div class="meta">
+      <span class="chip accent">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        301호
+      </span>
+      <span class="chip">3층 동관</span>
+      <span class="chip">바다 전망</span>
+    </div>
+  </section>
+
+  <section class="countdown reveal d3">
+    <div class="head">
+      <span class="lbl"><span class="live"></span>다음 일정</span>
+      <span class="at">in 2h 47m</span>
+    </div>
+    <div class="digits">
+      <span id="hh">02</span><span class="colon">:</span><span id="mm">47</span><span class="colon">:</span><span id="ss">03</span>
+    </div>
+    <div class="target">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      </div>
+      <div class="info">
+        <div class="name">저녁 예배</div>
+        <div class="place">본당 · 1층</div>
+      </div>
+      <div class="time">20:00</div>
+    </div>
+  </section>
+
+  <section class="verse reveal d4">
+    <div class="lbl">2026 Theme · 사도행전 / Acts</div>
+    <blockquote>
+      말세에 내가 내 영을 모든 육체에 <span class="em">부어 주리니</span>
+    </blockquote>
+    <cite>
+      <span>사도행전 2:17</span>
+      <span class="en">I will pour out my Spirit on all people.</span>
+    </cite>
+  </section>
+
+  <section class="schedule reveal d5">
+    <div class="head">
+      <span class="title">오늘의 일정</span>
+      <span class="meta">9 EVENTS</span>
+    </div>
+    <div class="ev past"><span class="time">06:00</span><span class="title">새벽기도</span><span class="place">본당</span></div>
+    <div class="ev past"><span class="time">08:00</span><span class="title">아침식사</span><span class="place">식당</span></div>
+    <div class="ev past"><span class="time">10:00</span><span class="title">첫째 시간 예배</span><span class="place">본당</span></div>
+    <div class="ev past"><span class="time">12:30</span><span class="title">점심식사</span><span class="place">식당</span></div>
+    <div class="ev past"><span class="time">14:30</span><span class="title">소그룹 모임</span><span class="place">각 방</span></div>
+    <div class="ev now"><span class="time">17:00</span><span class="title"><span class="live"></span>둘째 시간 예배</span><span class="place">본당</span></div>
+    <div class="ev"><span class="time">18:30</span><span class="title">저녁식사</span><span class="place">식당</span></div>
+    <div class="ev"><span class="time">20:00</span><span class="title">저녁 예배</span><span class="place">본당</span></div>
+    <div class="ev"><span class="time">22:00</span><span class="title">교제의 시간</span><span class="place">휴게실</span></div>
+  </section>
+
+</main>
+
+<script>
+  let total = 2*3600 + 47*60 + 3;
+  const $hh = document.getElementById('hh');
+  const $mm = document.getElementById('mm');
+  const $ss = document.getElementById('ss');
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    if (total <= 0) return;
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    $hh.textContent = pad(h); $mm.textContent = pad(m); $ss.textContent = pad(s);
+    total--;
+  }
+  tick(); setInterval(tick, 1000);
+  function dismissOverlay() { document.getElementById('overlay').classList.add('hidden'); }
+</script>
+</body>
+</html>

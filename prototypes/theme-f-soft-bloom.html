@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bridge Retreat · F — Soft Bloom</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F8F4EE;
+    --surface: #FFFFFF;
+    --ink: #2B2522;
+    --muted: #8B7E76;
+    --signal: #B85450;
+    --signal-soft: rgba(184,84,80,0.08);
+    --line: rgba(43,37,34,0.08);
+    --shadow: 0 1px 2px rgba(43,37,34,0.04), 0 8px 24px rgba(43,37,34,0.04);
+    --kr: 'Pretendard Variable', Pretendard, sans-serif;
+    --en: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body {
+    font-family: var(--kr);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding: 28px 20px 96px;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+  /* Subtle warm glow at top */
+  body::before {
+    content: "";
+    position: fixed; top: -120px; left: -10%; right: -10%;
+    height: 480px;
+    background: radial-gradient(ellipse at 60% 50%, rgba(184,84,80,0.10), transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body > * { position: relative; z-index: 1; }
+
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .topbar .brand {
+    font-family: var(--en); font-weight: 500; font-size: 12px;
+    color: var(--muted); letter-spacing: 0.04em;
+  }
+  .topbar .date {
+    background: var(--surface); padding: 6px 12px;
+    border-radius: 9999px; font-size: 11px; font-weight: 500;
+    color: var(--muted); box-shadow: var(--shadow);
+  }
+
+  /* Welcome card */
+  .welcome {
+    background: var(--surface); border-radius: 12px;
+    padding: 28px 24px; box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .welcome .greet {
+    font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 4px;
+  }
+  .welcome h1 {
+    font-weight: 700; font-size: 30px; line-height: 1.2;
+    letter-spacing: -0.02em; margin-bottom: 16px;
+  }
+  .welcome .room-row {
+    display: flex; align-items: center; gap: 8px;
+    padding-top: 16px; border-top: 1px solid var(--line);
+  }
+  .welcome .room-pill {
+    background: var(--signal-soft); color: var(--signal);
+    padding: 6px 14px; border-radius: 9999px;
+    font-size: 13px; font-weight: 700;
+  }
+  .welcome .room-meta {
+    font-size: 13px; color: var(--muted);
+    font-family: var(--en); font-weight: 400;
+  }
+
+  /* Countdown card */
+  .countdown {
+    background: var(--surface); border-radius: 12px;
+    padding: 24px; box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    position: relative; overflow: hidden;
+  }
+  .countdown::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(184,84,80,0.06), transparent 60%);
+    pointer-events: none;
+  }
+  .countdown > * { position: relative; }
+  .countdown .head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .countdown .lbl {
+    font-size: 12px; font-weight: 600; color: var(--signal);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .countdown .lbl::before {
+    content: ""; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--signal); display: inline-block;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.5; }
+  }
+  .countdown .target-time {
+    font-family: var(--en); font-size: 12px; color: var(--muted);
+    font-weight: 500;
+  }
+  .countdown .digits {
+    font-family: var(--en);
+    font-feature-settings: "tnum" 1, "ss01" 1;
+    font-weight: 700; font-size: 56px; line-height: 1;
+    letter-spacing: -0.04em; color: var(--ink);
+    margin-bottom: 12px;
+  }
+  .countdown .sep { color: var(--muted); margin: 0 2px; }
+  .countdown .target {
+    font-size: 15px; font-weight: 700; color: var(--ink);
+  }
+  .countdown .place { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* Verse card */
+  .verse {
+    background: var(--surface); border-radius: 12px;
+    padding: 28px 24px; box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .verse .lbl {
+    font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600; margin-bottom: 18px;
+  }
+  .verse blockquote {
+    font-weight: 700; font-size: 19px; line-height: 1.6;
+    letter-spacing: -0.01em; margin-bottom: 16px;
+  }
+  .verse blockquote .em {
+    color: var(--signal);
+  }
+  .verse cite {
+    display: block; font-style: normal;
+    font-size: 12px; color: var(--muted); font-weight: 600;
+    font-family: var(--en);
+  }
+  .verse .en {
+    font-family: var(--en); font-weight: 300; font-size: 13px;
+    color: var(--muted); line-height: 1.55; margin-top: 14px;
+    padding-top: 14px; border-top: 1px solid var(--line);
+  }
+
+  /* Schedule */
+  .schedule { padding: 0 4px; }
+  .schedule .lbl {
+    display: flex; align-items: baseline; justify-content: space-between;
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    margin-bottom: 12px; padding: 0 4px;
+  }
+  .schedule .lbl .day {
+    font-family: var(--en); font-size: 11px; color: var(--muted);
+    font-weight: 500; letter-spacing: 0.06em;
+  }
+  .sch-card {
+    background: var(--surface); border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .sch-row {
+    display: grid;
+    grid-template-columns: 4px 56px 1fr auto;
+    align-items: center;
+    padding: 14px 16px 14px 0;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .sch-row:first-child { border-top: none; }
+  .sch-row .bar {
+    width: 4px; align-self: stretch;
+    background: var(--line);
+  }
+  .sch-row .time {
+    font-family: var(--en); font-feature-settings: "tnum" 1;
+    font-size: 14px; font-weight: 700; color: var(--ink);
+  }
+  .sch-row .title {
+    font-size: 15px; font-weight: 500; color: var(--ink);
+  }
+  .sch-row .place { font-size: 12px; color: var(--muted); }
+  .sch-row.past .time,
+  .sch-row.past .title,
+  .sch-row.past .place { color: var(--muted); opacity: 0.55; }
+  .sch-row.now { background: var(--signal-soft); }
+  .sch-row.now .bar { background: var(--signal); }
+  .sch-row.now .title { font-weight: 700; color: var(--signal); }
+  .sch-row.now .now-tag {
+    display: inline-block;
+    background: var(--signal); color: #fff;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 9999px;
+    margin-left: 6px;
+    font-family: var(--en); letter-spacing: 0.04em;
+  }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(248,244,238,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    z-index: 100;
+    transition: opacity .25s ease;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay-card {
+    background: var(--surface); border-radius: 16px;
+    padding: 32px 28px;
+    max-width: 360px; width: 100%;
+    box-shadow: 0 20px 60px rgba(43,37,34,0.16);
+    text-align: center;
+  }
+  .overlay-card .icon {
+    width: 56px; height: 56px;
+    background: var(--signal-soft); color: var(--signal);
+    border-radius: 9999px; display: inline-flex;
+    align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .overlay-card h2 {
+    font-weight: 700; font-size: 22px; line-height: 1.3;
+    letter-spacing: -0.01em; margin-bottom: 12px;
+  }
+  .overlay-card p {
+    color: var(--muted); font-size: 14px; line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .btn {
+    display: block; width: 100%; padding: 16px 24px;
+    background: var(--signal); color: #fff;
+    border: none; border-radius: 9999px;
+    font-family: inherit; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: transform .15s, opacity .15s;
+  }
+  .btn:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-link {
+    display: block; width: 100%; margin-top: 8px;
+    background: none; color: var(--muted);
+    font-size: 13px; padding: 14px; font-weight: 500;
+    border: none; cursor: pointer; font-family: inherit;
+  }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <div class="icon">301</div>
+    <h2>301호에<br>체크인 하셨나요?</h2>
+    <p>배정된 방에 짐을 두셨다면 확인해 주세요. 아직이라면 안내 데스크에 문의해 주세요.</p>
+    <button class="btn" onclick="document.getElementById('overlay').classList.add('hidden')">체크인 완료</button>
+    <button class="btn-link" onclick="document.getElementById('overlay').classList.add('hidden')">나중에 하기</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <span class="brand">Bridge Retreat 2026</span>
+  <span class="date">DAY 02 · 05.30</span>
+</header>
+
+<section class="welcome">
+  <div class="greet">환영합니다</div>
+  <h1>박존 님,<br>안녕하세요!</h1>
+  <div class="room-row">
+    <span class="room-pill">301호</span>
+    <span class="room-meta">3층 · 동관</span>
+  </div>
+</section>
+
+<section class="countdown">
+  <div class="head">
+    <span class="lbl">다음 일정까지</span>
+    <span class="target-time">20:00</span>
+  </div>
+  <div class="digits"><span id="hh">02</span><span class="sep">:</span><span id="mm">47</span><span class="sep">:</span><span id="ss">03</span></div>
+  <div class="target">저녁 예배</div>
+  <div class="place">본당 · 1층</div>
+</section>
+
+<section class="verse">
+  <div class="lbl">2026 Theme Verse</div>
+  <blockquote>
+    보라 내가 <span class="em">새 일</span>을 행하리니<br>
+    내가 광야에 길을 내며<br>
+    사막에 강을 내리니
+  </blockquote>
+  <cite>이사야 43:19</cite>
+  <div class="en">Behold, I am doing a new thing;<br>now it springs forth, do you not perceive it?</div>
+</section>
+
+<section class="schedule">
+  <div class="lbl">
+    <span>오늘의 일정</span>
+    <span class="day">DAY 02 · 9 events</span>
+  </div>
+  <div class="sch-card">
+    <div class="sch-row past"><span class="bar"></span><span class="time">06:00</span><span class="title">새벽기도</span><span class="place">본당</span></div>
+    <div class="sch-row past"><span class="bar"></span><span class="time">08:00</span><span class="title">아침식사</span><span class="place">식당</span></div>
+    <div class="sch-row past"><span class="bar"></span><span class="time">10:00</span><span class="title">첫째 시간 예배</span><span class="place">본당</span></div>
+    <div class="sch-row past"><span class="bar"></span><span class="time">12:30</span><span class="title">점심식사</span><span class="place">식당</span></div>
+    <div class="sch-row past"><span class="bar"></span><span class="time">14:30</span><span class="title">소그룹 모임</span><span class="place">각 방</span></div>
+    <div class="sch-row now"><span class="bar"></span><span class="time">17:00</span><span class="title">둘째 시간 예배<span class="now-tag">NOW</span></span><span class="place">본당</span></div>
+    <div class="sch-row"><span class="bar"></span><span class="time">18:30</span><span class="title">저녁식사</span><span class="place">식당</span></div>
+    <div class="sch-row"><span class="bar"></span><span class="time">20:00</span><span class="title">저녁 예배</span><span class="place">본당</span></div>
+    <div class="sch-row"><span class="bar"></span><span class="time">22:00</span><span class="title">교제의 시간</span><span class="place">휴게실</span></div>
+  </div>
+</section>
+
+<script>
+  let total = 2*3600 + 47*60 + 3;
+  const hh = document.getElementById('hh');
+  const mm = document.getElementById('mm');
+  const ss = document.getElementById('ss');
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    if (total <= 0) return;
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    hh.textContent = pad(h);
+    mm.textContent = pad(m);
+    ss.textContent = pad(s);
+    total--;
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

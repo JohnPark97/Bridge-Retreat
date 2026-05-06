@@ -1,0 +1,60 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate config.js from template + secrets
+        env:
+          APPS_SCRIPT_URL:    ${{ secrets.APPS_SCRIPT_URL }}
+          APPS_SCRIPT_SECRET: ${{ secrets.APPS_SCRIPT_SECRET }}
+          ADMIN_PASSWORD:     ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          set -euo pipefail
+          : "${APPS_SCRIPT_URL:?APPS_SCRIPT_URL secret is not set}"
+          : "${APPS_SCRIPT_SECRET:?APPS_SCRIPT_SECRET secret is not set}"
+          : "${ADMIN_PASSWORD:?ADMIN_PASSWORD secret is not set}"
+
+          # Substitute placeholders → real values via env, never echoed.
+          # Using a Python heredoc because shell quoting + JS strings get hairy.
+          python3 - <<'PY'
+          import os, pathlib
+          tmpl = pathlib.Path("assets/js/config.template.js").read_text()
+          out = (
+              tmpl
+              .replace("PASTE_APPS_SCRIPT_URL_HERE",    os.environ["APPS_SCRIPT_URL"])
+              .replace("PASTE_APPS_SCRIPT_SECRET_HERE", os.environ["APPS_SCRIPT_SECRET"])
+              .replace("CHANGE_ME_TO_RETREAT_TEAM_PASSWORD", os.environ["ADMIN_PASSWORD"])
+          )
+          pathlib.Path("assets/js/config.js").write_text(out)
+          PY
+
+          echo "Generated assets/js/config.js"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bridge Retreat · E — Still Water</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --ink: #0F0F0F;
+    --mid: #8C8C88;
+    --past: #C4C4C0;
+    --signal: #C44536;
+    --line: #E8E8E4;
+    --kr: 'Pretendard Variable', Pretendard, sans-serif;
+    --en: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body {
+    font-family: var(--kr);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 24px 20px 80px;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 0.5px solid var(--ink);
+    margin-bottom: 28px;
+  }
+  .topbar .brand {
+    font-family: var(--en); font-weight: 600; font-size: 13px;
+    letter-spacing: 0.02em;
+  }
+  .topbar .date {
+    font-family: var(--en); font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  /* Welcome */
+  .welcome { margin-bottom: 32px; }
+  .welcome .greet {
+    font-size: 12px; font-weight: 400; color: var(--mid);
+    letter-spacing: 0.16em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .welcome h1 {
+    font-weight: 600; font-size: 32px; line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .welcome .meta {
+    margin-top: 14px;
+    display: flex; gap: 14px;
+    font-size: 13px; color: var(--mid);
+    border-top: 0.5px solid var(--line);
+    padding-top: 14px;
+  }
+  .welcome .meta strong { color: var(--ink); font-weight: 600; }
+
+  /* Countdown row */
+  .countdown {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    padding: 28px 0 24px;
+    border-bottom: 0.5px solid var(--line);
+    margin-bottom: 36px;
+  }
+  .countdown .lbl {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 10px;
+  }
+  .countdown .target {
+    font-size: 14px; font-weight: 600; color: var(--ink);
+  }
+  .countdown .place { font-size: 12px; color: var(--mid); margin-top: 2px; }
+  .countdown .digits {
+    font-family: var(--en);
+    font-feature-settings: "tnum" 1;
+    font-weight: 600; font-size: 44px; line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+  }
+  .countdown .sep { color: var(--mid); margin: 0 1px; }
+
+  /* Verse */
+  .verse {
+    padding: 28px 0;
+    border-bottom: 0.5px solid var(--line);
+    margin-bottom: 32px;
+  }
+  .verse .lbl {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 14px;
+  }
+  .verse blockquote {
+    font-weight: 400; font-size: 17px; line-height: 1.7;
+    color: var(--ink);
+  }
+  .verse blockquote .em {
+    font-weight: 600;
+    border-bottom: 1.5px solid var(--signal);
+    padding-bottom: 1px;
+  }
+  .verse cite {
+    display: block;
+    font-style: normal; font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--mid); font-family: var(--en);
+    margin-top: 16px;
+  }
+  .verse .en {
+    font-family: var(--en); font-weight: 400; font-size: 13px;
+    color: var(--mid); line-height: 1.55; margin-top: 12px;
+  }
+
+  /* Schedule — tight tabular grid */
+  .schedule .lbl {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 12px;
+  }
+  .sch-table { width: 100%; }
+  .sch-row {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: baseline;
+    padding: 14px 0;
+    border-top: 0.5px solid var(--line);
+    gap: 14px;
+  }
+  .sch-row:last-child { border-bottom: 0.5px solid var(--line); }
+  .sch-row .time {
+    font-family: var(--en); font-feature-settings: "tnum" 1;
+    font-size: 13px; font-weight: 600; color: var(--ink);
+  }
+  .sch-row .title {
+    font-size: 15px; font-weight: 400; color: var(--ink);
+  }
+  .sch-row .place {
+    font-size: 12px; color: var(--mid);
+  }
+  .sch-row.past .time,
+  .sch-row.past .title,
+  .sch-row.past .place { color: var(--past); }
+  .sch-row.now { position: relative; }
+  .sch-row.now .title { font-weight: 600; }
+  .sch-row.now .title::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--signal);
+    margin-right: 8px;
+    vertical-align: 2px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .sch-row.now .now-tag {
+    font-family: var(--en);
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--signal); font-weight: 600;
+    margin-left: 8px;
+  }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(255,255,255,0.97);
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px;
+    z-index: 100;
+    transition: opacity .25s ease;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay-card {
+    max-width: 360px; width: 100%;
+  }
+  .overlay-card .lbl {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--signal); font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 0.5px solid var(--ink);
+  }
+  .overlay-card h2 {
+    font-weight: 600; font-size: 28px; line-height: 1.25;
+    letter-spacing: -0.02em; margin-bottom: 16px;
+  }
+  .overlay-card p {
+    color: var(--mid); font-size: 14px; line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .btn {
+    display: block; width: 100%; padding: 16px 20px;
+    background: var(--ink); color: #fff;
+    border: none; border-radius: 2px;
+    font-family: inherit; font-size: 14px; font-weight: 600;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .btn:active { opacity: 0.85; }
+  .btn-link {
+    display: block; width: 100%; margin-top: 12px;
+    background: none; color: var(--mid);
+    font-size: 12px; padding: 14px; font-weight: 400;
+    border: none; cursor: pointer; font-family: inherit;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <div class="lbl">Room Check-in</div>
+    <h2>301호에 체크인 하셨나요?</h2>
+    <p>배정된 방에 짐을 두셨다면 아래 버튼을 눌러주세요.</p>
+    <button class="btn" onclick="document.getElementById('overlay').classList.add('hidden')">체크인 완료</button>
+    <button class="btn-link" onclick="document.getElementById('overlay').classList.add('hidden')">나중에</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <span class="brand">Bridge Retreat</span>
+  <span class="date">DAY 02 / 05.30</span>
+</header>
+
+<section class="welcome">
+  <div class="greet">환영합니다</div>
+  <h1>박존</h1>
+  <div class="meta">
+    <span>방 번호 <strong>301호</strong></span>
+    <span>·</span>
+    <span>3층 동관</span>
+  </div>
+</section>
+
+<section class="countdown">
+  <div>
+    <div class="lbl">Next</div>
+    <div class="target">저녁 예배</div>
+    <div class="place">20:00 · 본당</div>
+  </div>
+  <div class="digits"><span id="hh">02</span><span class="sep">:</span><span id="mm">47</span><span class="sep">:</span><span id="ss">03</span></div>
+</section>
+
+<section class="verse">
+  <div class="lbl">Theme · 2026</div>
+  <blockquote>
+    보라 내가 <span class="em">새 일</span>을 행하리니 이제 나타낼 것이라 내가 광야에 길을 내며 사막에 강을 내리니
+  </blockquote>
+  <cite>이사야 43:19</cite>
+  <div class="en">Behold, I am doing a new thing; now it springs forth, do you not perceive it?</div>
+</section>
+
+<section class="schedule">
+  <div class="lbl">Today · 오늘의 일정</div>
+  <div class="sch-table">
+    <div class="sch-row past"><span class="time">06:00</span><span class="title">새벽기도</span><span class="place">본당</span></div>
+    <div class="sch-row past"><span class="time">08:00</span><span class="title">아침식사</span><span class="place">식당</span></div>
+    <div class="sch-row past"><span class="time">10:00</span><span class="title">첫째 시간 예배</span><span class="place">본당</span></div>
+    <div class="sch-row past"><span class="time">12:30</span><span class="title">점심식사</span><span class="place">식당</span></div>
+    <div class="sch-row past"><span class="time">14:30</span><span class="title">소그룹 모임</span><span class="place">각 방</span></div>
+    <div class="sch-row now"><span class="time">17:00</span><span class="title">둘째 시간 예배<span class="now-tag">Live</span></span><span class="place">본당</span></div>
+    <div class="sch-row"><span class="time">18:30</span><span class="title">저녁식사</span><span class="place">식당</span></div>
+    <div class="sch-row"><span class="time">20:00</span><span class="title">저녁 예배</span><span class="place">본당</span></div>
+    <div class="sch-row"><span class="time">22:00</span><span class="title">교제의 시간</span><span class="place">휴게실</span></div>
+  </div>
+</section>
+
+<script>
+  let total = 2*3600 + 47*60 + 3;
+  const hh = document.getElementById('hh');
+  const mm = document.getElementById('mm');
+  const ss = document.getElementById('ss');
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    if (total <= 0) return;
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    hh.textContent = pad(h);
+    mm.textContent = pad(m);
+    ss.textContent = pad(s);
+    total--;
+  }
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>

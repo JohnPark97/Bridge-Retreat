@@ -1,0 +1,33 @@
+# Bridge Retreat 2026 — full 3-day program.
+# Edit times/titles/places as the program firms up.
+# `is_main: true` marks the events the countdown should target.
+
+days:
+  - date: 2026-05-29
+    label: Day 01
+    events:
+      - { time: "18:00", title: "등록 및 체크인", place: "로비",   type: "registration" }
+      - { time: "19:30", title: "환영 예배",      place: "본당",   type: "service", is_main: true }
+      - { time: "21:00", title: "교제의 시간",    place: "휴게실", type: "fellowship" }
+
+  - date: 2026-05-30
+    label: Day 02
+    events:
+      - { time: "06:00", title: "새벽기도",       place: "본당",   type: "service" }
+      - { time: "08:00", title: "아침식사",       place: "식당",   type: "meal" }
+      - { time: "10:00", title: "첫째 시간 예배", place: "본당",   type: "service", is_main: true }
+      - { time: "12:30", title: "점심식사",       place: "식당",   type: "meal" }
+      - { time: "14:30", title: "소그룹 모임",    place: "각 방",  type: "small_group" }
+      - { time: "17:00", title: "둘째 시간 예배", place: "본당",   type: "service", is_main: true }
+      - { time: "18:30", title: "저녁식사",       place: "식당",   type: "meal" }
+      - { time: "20:00", title: "저녁 예배",      place: "본당",   type: "service", is_main: true }
+      - { time: "22:00", title: "교제의 시간",    place: "휴게실", type: "fellowship" }
+
+  - date: 2026-05-31
+    label: Day 03
+    events:
+      - { time: "06:00", title: "새벽기도",       place: "본당",   type: "service" }
+      - { time: "08:00", title: "아침식사",       place: "식당",   type: "meal" }
+      - { time: "10:00", title: "마무리 예배",    place: "본당",   type: "service", is_main: true }
+      - { time: "12:00", title: "점심식사",       place: "식당",   type: "meal" }
+      - { time: "14:00", title: "해산",           place: "주차장", type: "departure" }

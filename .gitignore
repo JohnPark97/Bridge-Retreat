@@ -1,0 +1,13 @@
+# Real config — generated locally or by GitHub Actions from secrets.
+# config.template.js is the committed source of truth for which keys exist.
+assets/js/config.js
+
+# OS / editor noise
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+# Local dev server logs
+*.log

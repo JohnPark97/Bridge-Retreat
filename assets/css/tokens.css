@@ -1,0 +1,34 @@
+/* H — Calm. Muted modern palette + type tokens. */
+:root {
+  /* Surfaces */
+  --bg-base: #FBF9F7;
+  --card:    #FFFFFF;
+
+  /* Ink scale */
+  --ink:     #18181C;
+  --ink-2:   #3D3D45;
+  --ink-3:   #71717A;
+  --ink-4:   #A1A1AA;
+
+  /* Hairlines */
+  --line:    rgba(24,24,28,0.08);
+  --line-2:  rgba(24,24,28,0.05);
+
+  /* Muted accent palette — used in gradients + glows */
+  --peach:    #D4A691;  /* dusty terracotta */
+  --peach-2:  #E8CDB8;  /* soft terracotta  */
+  --lavender: #B4BED1;  /* muted periwinkle */
+  --lavender-2: #D7DDE7;
+  --mint:     #AEC2B0;  /* muted sage       */
+  --sun:      #D9C5A2;  /* muted gold       */
+  --rose:     #D4A2A6;  /* dusty rose       */
+  --signal:   #BC6E5B;  /* muted coral — live indicator only */
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgba(24,24,28,0.04), 0 4px 12px rgba(24,24,28,0.04);
+  --shadow-md: 0 4px 20px rgba(24,24,28,0.06), 0 12px 40px rgba(24,24,28,0.06);
+  --shadow-lg: 0 16px 56px rgba(24,24,28,0.10), 0 8px 24px rgba(24,24,28,0.06);
+
+  /* Type stack — Pretendard primary, Inter for English fallback */
+  --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
