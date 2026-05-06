@@ -695,6 +695,42 @@
 }
 .journal-meta .sep { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-4); }
 
+/* ─── Inline Check-in ─────────────────────── */
+.inline-checkin {
+  margin: 0 24px 24px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.checkin-prompt {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; color: var(--ink-2);
+}
+.checkin-done {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; color: var(--ink-3);
+}
+.checkin-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.checkin-dot.pending { background: var(--signal, #E74C3C); }
+.checkin-dot.done { background: var(--ink-4); }
+.checkin-btn {
+  padding: 8px 20px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.checkin-btn:hover { background: var(--ink); color: var(--bg-base); }
+.checkin-btn:disabled { opacity: 0.4; cursor: default; }
+
 /* 15m Alert Banner */
 .alert-banner {
   margin: 0 24px 32px; padding: 16px 20px;

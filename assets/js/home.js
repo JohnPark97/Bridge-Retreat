@@ -2,6 +2,9 @@ import { el, svg } from './dom.js';
 import {
   findNextMainEvent, todaysEvents, classifyEvents, getNow,
 } from './countdown.js';
+import { CONFIG } from './config.js';
+import { patchSession } from './auth.js';
+import { showToast } from './ui.js';
 
 const pad = n => String(n).padStart(2, '0');
 
@@ -13,6 +16,7 @@ export function renderHome(ctx) {
   // 1. Build Static Layouts
   const hero = buildJournalHero(theme, schedule);
   const meta = buildJournalMeta(session);
+  const checkin = buildInlineCheckin(session);
 
   // 2. Build Dynamic Layouts
   let dynamicContainer = el('div');
@@ -28,9 +32,7 @@ export function renderHome(ctx) {
   };
   updateDynamic();
 
-  // 3. Build Action Bar
-
-  root.append(hero, meta, dynamicContainer);
+  root.append(hero, meta, checkin, dynamicContainer);
 
   // Update dynamic parts every minute
   setInterval(updateDynamic, 60 * 1000);
@@ -150,5 +152,69 @@ function buildSegmentedAgenda(events) {
   });
 
   return section;
+}
+
+// ─── Inline Check-in ─────────────────────────
+
+function buildInlineCheckin(session) {
+  const container = el('div', { class: 'inline-checkin reveal d4' });
+
+  if (session.checked_in_at) {
+    return container;
+  }
+
+  // Not checked in — gentle prompt
+  const btn = el('button', { class: 'checkin-btn', type: 'button' }, '체크인');
+  const label = el('div', { class: 'checkin-prompt' },
+    el('span', { class: 'checkin-dot pending' }),
+    el('span', { text: '수련회장에 잘 도착하셨나요?' }),
+  );
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = '확인 중…';
+    try {
+      const ts = await submitCheckin(session.id);
+      patchSession({ checked_in_at: ts });
+      container.remove();
+      showToast('체크인 완료!');
+    } catch (err) {
+      console.error('checkin failed', err);
+      btn.disabled = false;
+      btn.textContent = '체크인';
+      showToast('연결에 문제가 있어요. 다시 시도해 주세요.');
+    }
+  });
+
+  container.append(
+    el('div', { style: 'display:flex; align-items:center; justify-content:space-between;' },
+      label, btn,
+    )
+  );
+  return container;
+}
+
+async function submitCheckin(userId) {
+  const url = CONFIG.APPS_SCRIPT_URL;
+
+  // Dev mode — Apps Script not configured
+  if (!url || /^PASTE_/.test(url)) {
+    console.warn('Apps Script not configured — skipping remote write');
+    return new Date().toISOString();
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      secret:  CONFIG.APPS_SCRIPT_SECRET,
+      action:  'checkin',
+      user_id: userId,
+    }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.err || 'unknown');
+  return data.checked_in_at || new Date().toISOString();
 }
 

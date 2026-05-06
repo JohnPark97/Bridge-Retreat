@@ -65,7 +65,6 @@ function showGate() {
   content.append(card);
 
   // Hide splash
-  hideSplash();
   setTimeout(() => input.focus(), 50);
 }
 
@@ -89,7 +88,6 @@ async function bootstrap() {
   const cells    = cR.status === 'fulfilled' ? cR.value : [];
 
   loading.remove();
-  hideSplash();
 
   if (roster.length === 0) {
     content.append(el('div', {
@@ -451,11 +449,3 @@ function buildLogoutFooter() {
   );
 }
 
-function hideSplash() {
-  const splash = document.getElementById('splash');
-  if (splash) {
-    splash.style.opacity = '0';
-    splash.style.visibility = 'hidden';
-    setTimeout(() => splash.remove(), 600);
-  }
-}

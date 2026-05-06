@@ -2,7 +2,6 @@ import { getSession } from './auth.js';
 import { loadTheme, loadSchedule, loadRoster, loadCells } from './data.js';
 import { initTabs } from './tabs.js';
 import { getNow } from './countdown.js';
-import { maybeShowCheckin } from './checkin.js';
 
 const session = getSession();
 if (!session) {
@@ -35,16 +34,7 @@ async function bootstrap() {
   try { (await import(`./schedule.js?v=${v}`)).renderSchedule(ctx); } catch (e) { console.error('schedule', e); }
   try { (await import(`./group.js?v=${v}`)).renderGroup(ctx); }       catch (e) { console.error('group', e); }
 
-  // Hide splash screen smoothly
-  const splash = document.getElementById('splash');
-  if (splash) {
-    splash.style.opacity = '0';
-    splash.style.visibility = 'hidden';
-    setTimeout(() => splash.remove(), 600);
-  }
-
   initTabs();
-  maybeShowCheckin(session);
 }
 
 function pad(n) { return String(n).padStart(2, '0'); }
