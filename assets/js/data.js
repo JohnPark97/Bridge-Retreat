@@ -94,6 +94,16 @@ function maybeCached(key, fetcher) {
   return devMode() ? fetcher() : withSWR(key, fetcher);
 }
 
+export function clearDataCache() {
+  try {
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith(CACHE_PREFIX)) localStorage.removeItem(key);
+    }
+  } catch {
+    // Storage unavailable — fresh fetches still work, just no cache to clear.
+  }
+}
+
 const mapRoster = rows => rows.map(row => ({
   id:            Number(row.id),
   korean_name:   String(row.korean_name || '').trim(),
@@ -118,13 +128,15 @@ export async function loadSchedule() {
   return maybeCached('schedule', () => loadYaml('data/schedule.yml'));
 }
 
-export async function loadRoster() {
+export async function loadRoster(options = {}) {
   if (devMode()) return mapRoster(await loadSampleCsv('data/sample-roster.csv'));
+  if (options.fresh) return mapRoster(await loadFromAppsScript('read_roster'));
   return withSWR('roster', async () => mapRoster(await loadFromAppsScript('read_roster')));
 }
 
-export async function loadCells() {
+export async function loadCells(options = {}) {
   if (devMode()) return mapCells(await loadSampleCsv('data/sample-cells.csv'));
+  if (options.fresh) return mapCells(await loadFromAppsScript('read_cells'));
   return withSWR('cells', async () => mapCells(await loadFromAppsScript('read_cells')));
 }
 

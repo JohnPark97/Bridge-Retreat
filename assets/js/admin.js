@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { el, svg } from './dom.js';
-import { loadSchedule, loadRoster, loadCells } from './data.js';
+import { clearDataCache, loadSchedule, loadRoster, loadCells } from './data.js?v=admin-fresh';
 import { findNextMainEvent, getNow, startCountdown } from './countdown.js';
 
 const ICON_SEARCH = ['M11 19a8 8 0 100-16 8 8 0 000 16z', 'M21 21l-4.3-4.3'];
@@ -47,6 +47,7 @@ function showGate() {
     }
     if (input.value === expected) {
       sessionStorage.setItem(CONFIG.ADMIN_SESSION_KEY, '1');
+      clearDataCache();
       bootstrap();
     } else {
       error.textContent = '비밀번호가 맞지 않아요.';
@@ -81,7 +82,7 @@ async function bootstrap() {
   content.append(loading);
 
   const [sR, rR, cR] = await Promise.allSettled([
-    loadSchedule(), loadRoster(), loadCells(),
+    loadSchedule(), loadRoster({ fresh: true }), loadCells({ fresh: true }),
   ]);
   const schedule = sR.status === 'fulfilled' ? sR.value : null;
   const roster   = rR.status === 'fulfilled' ? rR.value : [];
@@ -116,7 +117,10 @@ async function bootstrap() {
   // Auto-refresh every 30 seconds
   setInterval(async () => {
     try {
-      const [rR2, cR2] = await Promise.allSettled([loadRoster(), loadCells()]);
+      const [rR2, cR2] = await Promise.allSettled([
+        loadRoster({ fresh: true }),
+        loadCells({ fresh: true }),
+      ]);
       const freshRoster = rR2.status === 'fulfilled' ? rR2.value : roster;
       const freshCells  = cR2.status === 'fulfilled' ? cR2.value : cells;
 
@@ -486,4 +490,3 @@ function buildLogoutFooter() {
     }, '로그아웃'),
   );
 }
-
