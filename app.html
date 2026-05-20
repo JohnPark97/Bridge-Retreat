@@ -9,7 +9,7 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/components.css">
+<link rel="stylesheet" href="assets/css/components.css?v=map">
 </head>
 <body>
 
@@ -23,6 +23,7 @@
   <section id="home"     class="tab-panel"></section>
   <section id="schedule" class="tab-panel" hidden></section>
   <section id="group"    class="tab-panel" hidden></section>
+  <section id="map"      class="tab-panel" hidden></section>
 </main>
 
 <nav class="tabbar" aria-label="주요 탭">
@@ -47,10 +48,17 @@
     </svg>
     조원
   </button>
+  <div class="divider"></div>
+  <button class="tab" data-tab="map">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle>
+    </svg>
+    지도
+  </button>
 </nav>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script type="module" src="assets/js/app.js"></script>
+<script type="module" src="assets/js/app.js?v=map"></script>
 </body>
 </html>

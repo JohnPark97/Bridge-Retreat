@@ -1,4 +1,4 @@
-const VALID = new Set(['home', 'schedule', 'group']);
+const VALID = new Set(['home', 'schedule', 'group', 'map']);
 const DEFAULT = 'home';
 
 export function initTabs() {

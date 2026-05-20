@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Tab — Prototype</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  :root {
+    --bg: #F7F8FA;
+    --card: #FFFFFF;
+    --ink: #1A1A1A;
+    --ink-2: #6B6B6B;
+    --ink-3: #9A9A9A;
+    --ink-4: #C8C8C8;
+    --line: #E8E8E8;
+    --signal: #E74C3C;
+    --signal-ok: #6B6B6B;
+    --bg-accent-soft: rgba(26,26,26,0.04);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Layout Toggle ──────────────────────── */
+  .view-toggle {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; background: var(--card); border-bottom: 1px solid var(--line);
+    padding: 12px 16px; gap: 8px;
+  }
+  .view-toggle button {
+    flex: 1; padding: 10px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); font-family: inherit; font-size: 13px; font-weight: 700;
+    color: var(--ink-3); cursor: pointer; transition: all 0.2s;
+  }
+  .view-toggle button.active {
+    background: var(--ink); color: #fff; border-color: var(--ink);
+  }
+
+  .view { display: none; padding: 72px 0 120px; }
+  .view.active { display: block; }
+
+  /* ─── Shared Map Container ───────────────── */
+  .dorm-map-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .dorm-map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+  }
+
+  /* ─── Room Pin (shared) ──────────────────── */
+  .room-pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+  }
+
+  /* ─── USER VIEW: Personal Pin ────────────── */
+  .room-pin--me .dot {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    animation: pulse-me 2.4s ease-in-out infinite;
+  }
+  .room-pin--me .dot::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    opacity: 0;
+    animation: ring-out 2.4s ease-out infinite;
+  }
+  .room-pin--me .label {
+    margin-top: 4px;
+    padding: 3px 8px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 6px;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    letter-spacing: -0.01em;
+  }
+
+  @keyframes pulse-me {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+  @keyframes ring-out {
+    0% { transform: scale(0.8); opacity: 0.6; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+
+  /* ─── Roommate Card ──────────────────────── */
+  .roommate-card {
+    margin: 20px 20px 0;
+    padding: 20px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md);
+  }
+  .roommate-card .card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .roommate-card .card-title {
+    font-size: 15px; font-weight: 800; color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .roommate-card .card-room {
+    font-size: 12px; font-weight: 700; color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .roommate-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+  }
+  .roommate-row + .roommate-row {
+    border-top: 1px solid var(--bg);
+  }
+  .roommate-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--bg-accent-soft);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; color: var(--ink);
+    flex-shrink: 0;
+  }
+  .roommate-name {
+    font-size: 15px; font-weight: 600; color: var(--ink);
+    flex: 1;
+  }
+  .roommate-me {
+    font-size: 10px; font-weight: 800; color: var(--ink);
+    background: var(--bg-accent-soft);
+    padding: 3px 8px; border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+  .roommate-cell {
+    font-size: 12px; font-weight: 600; color: var(--ink-3);
+  }
+
+  /* ─── Floor highlight (user view) ────────── */
+  .floor-indicator {
+    margin: 16px 20px 0;
+    text-align: center;
+  }
+  .floor-indicator .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    background: var(--bg-accent-soft);
+    border-radius: 999px;
+    font-size: 12px; font-weight: 700; color: var(--ink-2);
+    letter-spacing: 0.04em;
+  }
+
+  /* ─── ADMIN VIEW: Status Pins ────────────── */
+  .room-pin--status {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .room-pin--status:hover {
+    transform: translate(-50%, -50%) scale(1.3);
+    z-index: 20;
+  }
+  .room-pin--status .dot {
+    position: relative;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 2.5px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800; color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .room-pin--status.warn .dot {
+    background: var(--signal);
+  }
+  .room-pin--status.ok .dot {
+    background: var(--signal-ok);
+  }
+  .room-pin--status .tooltip {
+    position: absolute;
+    bottom: calc(100% + 6px); left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .room-pin--status .tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%; transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--ink);
+  }
+  .room-pin--status:hover .tooltip {
+    opacity: 1;
+  }
+
+  /* ─── Admin Map Legend ───────────────────── */
+  .map-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin: 16px 20px 0;
+    font-size: 12px; font-weight: 600; color: var(--ink-2);
+  }
+  .map-legend .item {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .map-legend .swatch {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .map-legend .swatch.warn { background: var(--signal); }
+  .map-legend .swatch.ok { background: var(--signal-ok); }
+
+  /* ─── Section Headers ────────────────────── */
+  .section-header {
+    margin: 32px 20px 16px;
+    text-align: center;
+  }
+  .section-header .title {
+    font-size: 12px; font-weight: 700; color: var(--ink-2);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section-header .subtitle {
+    font-size: 22px; font-weight: 800; color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  /* ─── Tab bar mock ───────────────────────── */
+  .mock-tabbar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    display: flex; align-items: stretch; z-index: 30;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .mock-tabbar .tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px;
+    padding: 16px 8px;
+    color: var(--ink-3); font-size: 12px; font-weight: 700;
+    font-family: inherit; background: none; border: none; cursor: default;
+  }
+  .mock-tabbar .tab.active { color: var(--ink); }
+  .mock-tabbar .tab svg {
+    width: 22px; height: 22px; stroke-width: 1.8;
+    fill: none; stroke: currentColor;
+    stroke-linecap: round; stroke-linejoin: round;
+  }
+  .mock-tabbar .tab.active svg { stroke-width: 2.2; }
+  .mock-tabbar .divider {
+    width: 1px; background: var(--line); margin: 12px 0;
+  }
+
+  /* ─── Map wrapper padding ────────────────── */
+  .map-section {
+    padding: 0 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── View Toggle ──────────────────────────── -->
+<div class="view-toggle">
+  <button class="active" onclick="switchView('user')">👤 User View (app.html)</button>
+  <button onclick="switchView('admin')">🔧 Admin View (admin.html)</button>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- USER VIEW                                    -->
+<!-- ════════════════════════════════════════════ -->
+<div id="view-user" class="view active">
+
+  <div class="section-header">
+    <div class="title">지도</div>
+    <div class="subtitle">내 방 위치</div>
+  </div>
+
+  <div class="floor-indicator">
+    <span class="badge">📍 3층 · 301호</span>
+  </div>
+
+  <div class="map-section" style="margin-top: 16px;">
+    <div class="dorm-map-wrap" id="user-map">
+      <img class="dorm-map-img" src="../assets/imgs/dorm map.png" alt="Dorm Map">
+      <!-- User's room pin — placed dynamically by JS below -->
+    </div>
+  </div>
+
+  <div class="roommate-card">
+    <div class="card-header">
+      <span class="card-title">301호 룸메이트</span>
+      <span class="card-room">3층</span>
+    </div>
+    <div class="roommate-row">
+      <div class="roommate-avatar">박</div>
+      <span class="roommate-name">박존</span>
+      <span class="roommate-me">나</span>
+    </div>
+    <div class="roommate-row">
+      <div class="roommate-avatar">이</div>
+      <span class="roommate-name">이민호</span>
+      <span class="roommate-cell">1조</span>
+    </div>
+  </div>
+
+  <!-- Mock tab bar showing "지도" as active -->
+  <nav class="mock-tabbar">
+    <div class="tab">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      홈
+    </div>
+    <div class="divider"></div>
+    <div class="tab">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+      일정
+    </div>
+    <div class="divider"></div>
+    <div class="tab">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      조원
+    </div>
+    <div class="divider"></div>
+    <div class="tab active">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      지도
+    </div>
+  </nav>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- ADMIN VIEW                                   -->
+<!-- ════════════════════════════════════════════ -->
+<div id="view-admin" class="view">
+
+  <div class="section-header">
+    <div class="title">방별 · 전체 지도</div>
+    <div class="subtitle">체크인 현황</div>
+  </div>
+
+  <div class="map-legend">
+    <span class="item"><span class="swatch warn"></span> 미완료</span>
+    <span class="item"><span class="swatch ok"></span> 전원 체크인</span>
+  </div>
+
+  <div class="map-section" style="margin-top: 16px;">
+    <div class="dorm-map-wrap" id="admin-map">
+      <img class="dorm-map-img" src="../assets/imgs/dorm map.png" alt="Dorm Map" id="click-target">
+      <!-- All room pins placed dynamically by JS below -->
+    </div>
+  </div>
+</div>
+
+<div id="coord-helper" style="position: fixed; bottom: 80px; left: 20px; background: #000; color: #fff; padding: 10px; border-radius: 8px; font-family: monospace; z-index: 999; font-size: 14px; pointer-events: none; opacity: 0.8;">
+  Click map to get coords
+</div>
+
+<script>
+// ─── Coordinate Helper ──────────────────────
+document.getElementById('click-target').addEventListener('click', function(e) {
+  const rect = this.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+  const helper = document.getElementById('coord-helper');
+  helper.innerText = `{ x: ${x.toFixed(1)}, y: ${y.toFixed(1)} },`;
+  console.log(`{ x: ${x.toFixed(1)}, y: ${y.toFixed(1)} },`);
+
+  // drop a temporary pin to visualize
+  const pin = document.createElement('div');
+  pin.style.position = 'absolute';
+  pin.style.left = x + '%';
+  pin.style.top = y + '%';
+  pin.style.width = '10px';
+  pin.style.height = '10px';
+  pin.style.background = 'blue';
+  pin.style.borderRadius = '50%';
+  pin.style.transform = 'translate(-50%, -50%)';
+  pin.style.zIndex = '9999';
+  pin.style.pointerEvents = 'none';
+  document.getElementById('admin-map').appendChild(pin);
+});
+
+// ─── View Toggle ────────────────────────────
+function switchView(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─── Room Coordinates (% of image) ──────────
+const ROOM_COORDS = (function() {
+  const coords = {};
+
+  // Floor 2 (Y offsets: -34% from Floor 3)
+  // Floor 3 (Base Y)
+  // Floor 4 (Y offsets: +34% from Floor 3)
+  const floorOffsets = { 2: -34, 3: 0, 4: 34.5 };
+
+  for (const floor of [2, 3, 4]) {
+    const fY = floorOffsets[floor];
+
+    // Left Wing
+    // Rooms: 1,3,5,7,9,11 (bottom), 2,4,6,8,10,12 (top)
+    for (let i = 0; i < 6; i++) {
+      const bottomRoom = floor * 100 + (1 + i * 2);
+      const topRoom = floor * 100 + (2 + i * 2);
+
+      const x = 20.5 + (i * 4.9);
+      const baseY = 42.5 + (i * 1.9) + fY;
+
+      // Bed icons are on the right side of the room box.
+      // Top rooms: bed is bottom-right
+      // Bottom rooms: bed is top-right
+      coords[topRoom] = { x: x + 2.8, y: baseY + 1.2 };
+      coords[bottomRoom] = { x: x + 1.5, y: baseY + 2.5 };
+    }
+
+    // Right Wing
+    // Rooms: 13,15,17,19,21,23 (bottom), 14,16,18,20,22,24 (top)
+    for (let i = 0; i < 6; i++) {
+      const bottomRoom = floor * 100 + (13 + i * 2);
+      const topRoom = floor * 100 + (14 + i * 2);
+
+      const x = 55.5 + (i * 4.9);
+      const baseY = 52.0 - (i * 1.9) + fY;
+
+      // Bed icons are on the right side of the room box.
+      // Top rooms: bed is bottom-right
+      // Bottom rooms: bed is top-right
+      coords[topRoom] = { x: x + 2.0, y: baseY + 1.2 };
+      coords[bottomRoom] = { x: x + 3.0, y: baseY + 2.5 };
+    }
+  }
+
+  return coords;
+})();
+
+// ─── Simulated Data ─────────────────────────
+const CURRENT_USER = { korean_name: '박존', room: '301', cell_name: '1조' };
+
+const ALL_ROOMS = {
+  // Floor 3 Left
+  301: { members: ['박존', '이민호'], checkedIn: 1, total: 2 },
+  302: { members: ['김지영'], checkedIn: 0, total: 1 },
+  303: { members: ['최수진'], checkedIn: 1, total: 1 },
+  304: { members: ['정태영'], checkedIn: 0, total: 1 },
+  305: { members: ['김지영'], checkedIn: 1, total: 1 },
+  306: { members: ['한미라'], checkedIn: 1, total: 1 },
+  307: { members: ['오준호'], checkedIn: 0, total: 1 },
+  308: { members: ['강은혜'], checkedIn: 1, total: 1 },
+
+  // Floor 3 Right
+  314: { members: ['오준호'], checkedIn: 0, total: 1 },
+  317: { members: ['강은혜'], checkedIn: 1, total: 1 },
+  324: { members: ['오준호'], checkedIn: 1, total: 1 },
+
+  // Floor 2
+  201: { members: ['박존', '이민호'], checkedIn: 2, total: 2 },
+  222: { members: ['박존', '이민호'], checkedIn: 1, total: 2 },
+
+  // Floor 4
+  405: { members: ['박존', '이민호'], checkedIn: 2, total: 2 },
+  420: { members: ['박존', '이민호'], checkedIn: 0, total: 2 },
+};
+
+// ─── Render User View Pin ───────────────────
+function renderUserPin() {
+  const map = document.getElementById('user-map');
+  const roomNum = parseInt(CURRENT_USER.room);
+  const coords = ROOM_COORDS[roomNum];
+  if (!coords) return;
+
+  const pin = document.createElement('div');
+  pin.className = 'room-pin room-pin--me';
+  pin.style.left = coords.x + '%';
+  pin.style.top = coords.y + '%';
+  pin.innerHTML = `
+    <div class="dot"></div>
+    <div class="label">${CURRENT_USER.korean_name}</div>
+  `;
+  map.appendChild(pin);
+}
+
+// ─── Render Admin View Pins ─────────────────
+function renderAdminPins() {
+  const map = document.getElementById('admin-map');
+
+  for (const [room, data] of Object.entries(ALL_ROOMS)) {
+    const coords = ROOM_COORDS[parseInt(room)];
+    if (!coords) continue;
+
+    const allDone = data.checkedIn === data.total;
+    const pin = document.createElement('div');
+    pin.className = `room-pin room-pin--status ${allDone ? 'ok' : 'warn'}`;
+    pin.style.left = coords.x + '%';
+    pin.style.top = coords.y + '%';
+    pin.innerHTML = `
+      <div class="dot">${data.total}</div>
+      <div class="tooltip">${room}호 · ${data.checkedIn}/${data.total} 체크인</div>
+    `;
+    map.appendChild(pin);
+  }
+}
+
+// ─── Init ───────────────────────────────────
+renderUserPin();
+renderAdminPins();
+</script>
+
+</body>
+</html>

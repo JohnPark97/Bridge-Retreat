@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Map Coordinate Mapper</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+  body {
+    font-family: 'Pretendard Variable', sans-serif;
+    margin: 0; padding: 20px;
+    background: #f0f0f0;
+    display: flex; gap: 20px;
+  }
+  .map-container {
+    position: relative;
+    width: 800px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+  .map-container img {
+    width: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .sidebar {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  .panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .instruction {
+    font-size: 18px;
+    font-weight: bold;
+    color: #E74C3C;
+    margin-bottom: 10px;
+  }
+  .btn {
+    padding: 10px 15px;
+    background: #1A1A1A;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .btn:hover { background: #333; }
+  .btn-undo { background: #9A9A9A; }
+  .btn-undo:hover { background: #6B6B6B; }
+
+  textarea {
+    width: 100%;
+    height: 300px;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+  }
+
+  .pin {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: blue;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .pin-label {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    margin-top: -8px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 10px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="map-container" id="map">
+  <img src="../assets/imgs/dorm map.png" alt="Map">
+  <div id="pins-layer"></div>
+</div>
+
+<div class="sidebar">
+  <div class="panel">
+    <h2>Map Calibrator</h2>
+    <p>Click on the map to plot the coordinates for each room.</p>
+
+    <div class="instruction" id="current-instruction">
+      Ready to start?
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+      <button class="btn" id="btn-start" onclick="startMapping()">Start Mapping</button>
+      <button class="btn btn-undo" id="btn-undo" onclick="undoLast()" disabled>Undo Last</button>
+    </div>
+
+    <h3>Progress</h3>
+    <p id="progress-text">0 / 70 rooms</p>
+  </div>
+
+  <div class="panel">
+    <h3>Generated JSON</h3>
+    <textarea id="output" readonly></textarea>
+  </div>
+</div>
+
+<script>
+  // Generate the sequence of rooms
+  const roomsToMap = [];
+  for (let floor of [2, 3, 4]) {
+    let maxRoom = floor === 2 ? 22 : 24;
+    for (let r = 1; r <= maxRoom; r++) {
+      let roomNum = floor * 100 + r;
+      roomsToMap.push(roomNum);
+    }
+  }
+
+  let currentIndex = 0;
+  let isMapping = false;
+  const mappedCoords = {};
+  const history = [];
+
+  const mapEl = document.getElementById('map');
+  const pinsLayer = document.getElementById('pins-layer');
+  const instructionEl = document.getElementById('current-instruction');
+  const progressEl = document.getElementById('progress-text');
+  const outputEl = document.getElementById('output');
+  const btnUndo = document.getElementById('btn-undo');
+  const btnStart = document.getElementById('btn-start');
+
+  function updateUI() {
+    progressEl.innerText = `${currentIndex} / ${roomsToMap.length} rooms mapped`;
+
+    if (currentIndex < roomsToMap.length) {
+      instructionEl.innerText = `👉 Please click room: ${roomsToMap[currentIndex]}호`;
+    } else {
+      instructionEl.innerText = `✅ All rooms mapped!`;
+      instructionEl.style.color = 'green';
+      isMapping = false;
+    }
+
+    btnUndo.disabled = currentIndex === 0;
+
+    // Generate output
+    if (Object.keys(mappedCoords).length > 0) {
+      let out = "const ROOM_COORDS = {\n";
+      for (const [room, coord] of Object.entries(mappedCoords)) {
+        out += `  ${room}: { x: ${coord.x.toFixed(2)}, y: ${coord.y.toFixed(2)} },\n`;
+      }
+      out += "};";
+      outputEl.value = out;
+    } else {
+      outputEl.value = "";
+    }
+  }
+
+  function startMapping() {
+    isMapping = true;
+    currentIndex = 0;
+    Object.keys(mappedCoords).forEach(k => delete mappedCoords[k]);
+    history.length = 0;
+    pinsLayer.innerHTML = '';
+    btnStart.innerText = "Restart Mapping";
+    updateUI();
+  }
+
+  function undoLast() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      const room = roomsToMap[currentIndex];
+      delete mappedCoords[room];
+
+      // Remove last pin
+      if (pinsLayer.lastChild) pinsLayer.removeChild(pinsLayer.lastChild);
+      if (pinsLayer.lastChild) pinsLayer.removeChild(pinsLayer.lastChild); // Remove label too
+
+      isMapping = true;
+      instructionEl.style.color = '#E74C3C';
+      updateUI();
+    }
+  }
+
+  mapEl.addEventListener('click', (e) => {
+    if (!isMapping || currentIndex >= roomsToMap.length) return;
+
+    const rect = mapEl.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    const currentRoom = roomsToMap[currentIndex];
+    mappedCoords[currentRoom] = { x, y };
+
+    // Draw pin
+    const pin = document.createElement('div');
+    pin.className = 'pin';
+    pin.style.left = `${x}%`;
+    pin.style.top = `${y}%`;
+
+    const label = document.createElement('div');
+    label.className = 'pin-label';
+    label.style.left = `${x}%`;
+    label.style.top = `${y}%`;
+    label.innerText = currentRoom;
+
+    pinsLayer.appendChild(pin);
+    pinsLayer.appendChild(label);
+
+    currentIndex++;
+    updateUI();
+  });
+
+</script>
+
+</body>
+</html>

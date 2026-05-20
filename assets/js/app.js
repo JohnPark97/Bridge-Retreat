@@ -1,6 +1,6 @@
 import { getSession } from './auth.js';
 import { loadTheme, loadSchedule, loadRoster, loadCells } from './data.js';
-import { initTabs } from './tabs.js';
+import { initTabs } from './tabs.js?v=map';
 import { getNow } from './countdown.js';
 
 const session = getSession();
@@ -33,6 +33,11 @@ async function bootstrap() {
   try { (await import(`./home.js?v=${v}`)).renderHome(ctx); }         catch (e) { console.error('home', e); }
   try { (await import(`./schedule.js?v=${v}`)).renderSchedule(ctx); } catch (e) { console.error('schedule', e); }
   try { (await import(`./group.js?v=${v}`)).renderGroup(ctx); }       catch (e) { console.error('group', e); }
+  try {
+    const mapContainer = document.getElementById('map');
+    const { renderUserMap } = await import(`./map.js?v=${v}`);
+    renderUserMap(mapContainer, session, roster);
+  } catch (e) { console.error('map', e); }
 
   initTabs();
 }

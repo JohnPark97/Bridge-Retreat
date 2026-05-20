@@ -412,7 +412,7 @@ function buildRoomsView(roster) {
     const allDone = checked === members.length && members.length > 0;
     const roomLabel = room === '미배정' ? room : `${room}호`;
 
-    const sectionLabel = el('div', { style: 'display:flex; align-items:baseline; justify-content:space-between; padding:20px 8px 8px;' },
+    const sectionLabel = el('div', { id: `room-section-${room}`, style: 'display:flex; align-items:baseline; justify-content:space-between; padding:20px 8px 8px;' },
       el('span', { style: 'font-size:16px; font-weight:800; color:var(--ink); letter-spacing:-0.01em;' },
         roomLabel,
         allDone ? el('span', { style: 'margin-left:8px; font-size:10px; font-weight:800; color:var(--ink-2); border:1px solid var(--line); padding:2px 6px; border-radius:99px; vertical-align:middle;', text: '✓' }) : null,
@@ -427,6 +427,13 @@ function buildRoomsView(roster) {
 
     panel.append(sectionLabel, memberList);
   }
+
+  // Lazy-load and render the interactive admin map
+  import('./map.js').then(({ renderAdminMap }) => {
+    const mapWrapper = el('div');
+    panel.insertBefore(mapWrapper, panel.firstChild);
+    renderAdminMap(mapWrapper, roomMap);
+  }).catch(e => console.error('Failed to load admin map:', e));
 
   return panel;
 }
